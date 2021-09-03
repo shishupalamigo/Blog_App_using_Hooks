@@ -19,3 +19,8 @@
     @apply bg-red-600 text-white focus:ring-red-500 hover:bg-red-400;
   }
 }
+
+input:disabled {
+  background: rgb(163, 159, 159);
+  cursor: not-allowed;
+}

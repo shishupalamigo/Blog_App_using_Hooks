@@ -28,7 +28,7 @@ export function validations(errors, name, value) {
         ? 'username should be atleast 6 characters'
         : '';
       break;
-    case 'passwd':
+    case 'password':
       errors.password = validatePassword(value);
       break;
     case 'email':

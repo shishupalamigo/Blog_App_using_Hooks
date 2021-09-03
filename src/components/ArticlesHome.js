@@ -1,6 +1,8 @@
 import React from 'react';
 import Articles from './Articles';
 import Tags from './Tags';
+import { ArticlesURL } from '../utilities/constants';
+import Pagiantion from './Pagination';
 
 class ArticlesHome extends React.Component {
   constructor(props) {
@@ -9,9 +11,9 @@ class ArticlesHome extends React.Component {
     this.state = {
       articles: null,
       error: '',
-      articlesCount: null,
+      articlesCount: 0,
       articlesPerPage: 10,
-      activePage: 1,
+      activePageIndex: 1,
       tagSelected: '',
     };
   }
@@ -19,17 +21,22 @@ class ArticlesHome extends React.Component {
   componentDidMount() {
     this.getArticles();
   }
-
-  handleClick = ({ target }) => {
-    let { id } = target.dataset;
-    this.setState({ activePage: id }, this.getArticles);
+  componentDidUpdate (_prevProps, prevState) {
+    if(prevState.activePageIndex !== this.state.activePageIndex || prevState.tagSelected !== this.state.tagSelected) {
+      this.getArticles();
+    }
+  };  
+  updateCurrentPageIndex = (index) => {
+    this.setState({ activePageIndex: index }, this.getArticles);
   };
 
   getArticles = () => {
-    let offset = (this.state.activePage - 1) * 10;
+    let limit = this.state.articlesPerPage;
+    let offset = (this.state.activePageIndex - 1) * 10;
     let tag = this.state.tagSelected;
     fetch(
-      `https://mighty-oasis-08080.herokuapp.com/api/articles/?limit=${this.state.articlesPerPage}&offset=${offset}` +
+      ArticlesURL +
+        `/?offset=${offset}&limit=${limit}` +
         (tag && `&tag=${tag}`)
     )
       .then((res) => {
@@ -52,10 +59,10 @@ class ArticlesHome extends React.Component {
 
   selectTag = ({ target }) => {
     let { value } = target.dataset;
-    this.setState({ tagSelected: value }, this.getArticles);
+    this.setState({ tagSelected: value }, this.getArticles());
   };
   render() {
-    let { articles, error } = this.state;
+    let { articles, error, articlesCount, articlesPerPage, activePageIndex } = this.state;
 
     return (
       // Hero section
@@ -93,7 +100,16 @@ class ArticlesHome extends React.Component {
           <div className="w-80">
             <Tags selectTag={this.selectTag} />
           </div>
+          {/* Pagination */}
         </section>
+        <div className="mt-10">
+          <Pagiantion
+            articlesCount={articlesCount}
+            articlesPerPage={articlesPerPage}
+            activePageIndex={activePageIndex}
+            updateCurrentPageIndex={this.updateCurrentPageIndex}
+          />
+        </div>
       </main>
     );
   }

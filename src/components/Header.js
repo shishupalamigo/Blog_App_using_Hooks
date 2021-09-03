@@ -9,6 +9,13 @@ function Header(props) {
         </h1>
       </NavLink>
       <nav className="flex">
+      <NavLink
+          to="/articles"
+          activeClassName="btn-active"
+          className="btn btn-green mr-5"
+        >
+          Articles
+        </NavLink>
         <NavLink
           to="/register"
           activeClassName="btn-active"

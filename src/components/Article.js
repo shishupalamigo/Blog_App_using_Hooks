@@ -1,5 +1,6 @@
 import React from "react";
 import Loader from "./Loader";
+import { ArticlesURL } from "../utilities/constants";
 
 class Article extends React.Component{
     constructor(props){
@@ -15,8 +16,8 @@ class Article extends React.Component{
     }
 
     getArticle = () => {
-        
-        fetch(`https://mighty-oasis-08080.herokuapp.com/api/articles/${this.props.match.params.slug}`)
+        let slug = this.props.match.params.slug;
+        fetch(ArticlesURL + `/${slug}`)
         .then((res) => {
             if(!res.ok)  {
                 throw new Error(res.statusText);

@@ -1,4 +1,5 @@
 import React from 'react';
+import { TagsURL } from '../utilities/constants';
 import Loader from './Loader';
 
 class Tags extends React.Component {
@@ -11,7 +12,7 @@ class Tags extends React.Component {
   }
 
   componentDidMount() {
-    fetch('https://mighty-oasis-08080.herokuapp.com/api/tags')
+    fetch(TagsURL)
       .then((res) => {
         if (!res.ok) {
           throw new Error(res.statusText);
@@ -36,13 +37,13 @@ class Tags extends React.Component {
       return <Loader />;
     }
     return (
-      <div className="flex flex-wrap bg-gray-200 px-4 py-8 rounded-md">
+      <aside className="flex flex-wrap bg-green-200 px-4 py-8 rounded-md">
         {allTags.map((tag) => {
         
             return (
               <span
                 key={tag}
-                className="bg-gray-700 p-2 cursor-pointer text-white text-xs rounded-md mx-1 my-1"
+                className="bg-gray-800 p-2 cursor-pointer text-white text-xs rounded-md mx-1 my-1"
                 onClick={(e) => this.props.selectTag(e)}
                 data-value={tag}
               >
@@ -50,7 +51,7 @@ class Tags extends React.Component {
               </span>
             );
         })}
-      </div>
+      </aside>
     );
   }
 }
