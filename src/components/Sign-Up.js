@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { validations } from "../utilities/validations"
+import { registerURL } from '../utilities/constants';
+import { validations } from '../utilities/validations';
 
 class Signup extends React.Component {
   constructor(props) {
@@ -20,13 +21,40 @@ class Signup extends React.Component {
   handleChange = ({ target }) => {
     let { name, value } = target;
     let errors = this.state.errors;
-     validations(errors, name, value);
+    validations(errors, name, value);
     this.setState({ [name]: value, errors });
   };
 
   handleSubmit = (event) => {
+    let { email, password, username, errors } = this.state;
     event.preventDefault();
+    if (username && password && email) {
+      fetch(registerURL, {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        },
+        body: JSON.stringify({ user: { username, password, email } }),
+      }).then((res) => {
+        if (!res.ok) {
+          return res.json().then((data) => {
+            for (let key in data.errors) {
+              errors[key] = `${key} ${data.errors[key]}`;
+            }
+            return Promise.reject(errors);
+          });
+        }
+        return res.json();
+      })
+      .then((data) => {
+        console.log(data);
+        this.props.handleUser(data.user);
+        this.props.history.push("/login");
+    })
+    .catch((err) => this.setState({password: "", email: "", username: "", errors}));
+    }
   };
+
   render() {
     let { username, password, email } = this.state.errors;
     return (
@@ -70,7 +98,7 @@ class Signup extends React.Component {
                 type="password"
                 placeholder="Enter Password"
                 value={this.state.password}
-                name="passwd"
+                name="password"
                 onChange={(e) => this.handleChange(e)}
               />
               <span className="text-red-500">{password}</span>

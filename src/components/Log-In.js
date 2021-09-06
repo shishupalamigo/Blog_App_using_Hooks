@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { validations } from '../utilities/validations';
+import { loginURL } from '../utilities/constants';
 
 class Login extends React.Component {
   constructor(props) {
@@ -23,8 +24,39 @@ class Login extends React.Component {
   };
 
   handleSubmit = (event) => {
+    let {email, password, errors} = this.state;
     event.preventDefault();
+    if(password && email) {
+      fetch(loginURL, {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json; charset=UTF-8"
+          },
+          body: JSON.stringify({user: {password: password, email}}),
+      })
+      .then((res) => {
+          if(!res.ok) {
+              return res.json().then((data) => {
+                for (let key in data.errors) {
+                  errors[key] = `${key} ${data.errors[key]}`;  
+                }
+                return Promise.reject(errors)   
+             });
+          }
+          return res.json();
+      })
+      .then((data) => {
+          console.log(data);
+          this.props.handleUser(data.user);
+          this.props.history.push("/");
+      })
+      .catch((err) => this.setState({password: "", email: "", errors}));
+  }
   };
+
+  handleLocalStorage = (user) => {
+    localStorage.setItem("userInfo", JSON.stringify(user));
+  }
 
   render() {
     let { email, password } = this.state.errors;
