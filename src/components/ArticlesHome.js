@@ -1,7 +1,7 @@
 import React from 'react';
 import Articles from './Articles';
 import Tags from './Tags';
-import { ArticlesURL } from '../utilities/constants';
+import { ArticlesURL, feedURL, localStorageKey } from '../utilities/constants';
 import Pagiantion from './Pagination';
 
 class ArticlesHome extends React.Component {
@@ -15,17 +15,25 @@ class ArticlesHome extends React.Component {
       articlesPerPage: 10,
       activePageIndex: 1,
       tagSelected: '',
+      feedSelected: '',
     };
   }
 
   componentDidMount() {
-    this.getArticles();
+    if (this.props.isLoggedIn) {
+      this.setState({ feedSelected: 'myfeed' }, this.myFeed);
+    } else {
+      this.setState({ feedSelected: 'global' }, this.getArticles);
+    }
   }
-  componentDidUpdate (_prevProps, prevState) {
-    if(prevState.activePageIndex !== this.state.activePageIndex || prevState.tagSelected !== this.state.tagSelected) {
+  componentDidUpdate(_prevProps, prevState) {
+    if (
+      prevState.activePageIndex !== this.state.activePageIndex ||
+      prevState.tagSelected !== this.state.tagSelected
+    ) {
       this.getArticles();
     }
-  };  
+  }
   updateCurrentPageIndex = (index) => {
     this.setState({ activePageIndex: index }, this.getArticles);
   };
@@ -35,9 +43,7 @@ class ArticlesHome extends React.Component {
     let offset = (this.state.activePageIndex - 1) * 10;
     let tag = this.state.tagSelected;
     fetch(
-      ArticlesURL +
-        `/?offset=${offset}&limit=${limit}` +
-        (tag && `&tag=${tag}`)
+      ArticlesURL + `/?offset=${offset}&limit=${limit}` + (tag && `&tag=${tag}`)
     )
       .then((res) => {
         if (!res.ok) {
@@ -60,8 +66,45 @@ class ArticlesHome extends React.Component {
     let { value } = target.dataset;
     this.setState({ tagSelected: value }, this.getArticles());
   };
+
+  myFeed = () => {
+    let offset = (this.state.activePageIndex - 1) * 10;
+    let token = localStorage[localStorageKey];
+    let bearer = 'Bearer ' + token;
+    fetch(feedURL + `?/limit=${this.state.activePageIndex}&skip=${offset}`, {
+      method: 'GET',
+      headers: {
+        Authorization: bearer,
+        'Content-type': 'application/json',
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(res.statusText);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        this.setState({
+          articles: data.articles,
+          articlesCount: data.articlesCount,
+          feedSelected: 'myfeed',
+          tagSelected: '',
+        });
+      })
+
+      .catch((err) => this.setState({ error: 'Not able to fetch Articles' }));
+  };
+
   render() {
-    let { articles, error, articlesCount, articlesPerPage, activePageIndex } = this.state;
+    let {
+      articles,
+      error,
+      articlesCount,
+      articlesPerPage,
+      activePageIndex,
+      feedSelected,
+    } = this.state;
 
     return (
       // Hero section
@@ -69,17 +112,37 @@ class ArticlesHome extends React.Component {
         {/* feeds part */}
         <div className="flex mb-3">
           <span
-            className="cursor-pointer text-xl text-blue-900"
+            className={
+              !this.props.isLoggedIn
+                ? 'hidden'
+                : feedSelected === 'myfeed'
+                ? 'text-xl mr-8 cursor-pointer text-green-500'
+                : 'text-xl mr-8 cursor-pointer green'
+            }
+            onClick={this.myFeed}
+          >
+            {' '}
+            <i className="fas fa-newspaper mr-2"></i>
+            My feed
+          </span>
+          <span
+            className={
+              feedSelected === 'global'
+                ? 'cursor-pointer text-xl text-green-500'
+                : 'cursor-pointer text-xl'
+            }
             onClick={() =>
               this.setState(
                 {
                   tagSelected: '',
+                  feedSelected: 'global',
                 },
                 this.getArticles
               )
             }
           >
-            Global Feed{' '}
+            <i className="fas fa-newspaper mr-2"></i>
+            Global Feed
           </span>
           <div
             className={this.state.tagSelected ? 'visible text-xl' : 'hidden'}

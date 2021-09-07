@@ -18,7 +18,7 @@ class App extends React.Component {
   state = {
     isLoggedIn: false,
     user: null,
-    isVerifying : true,
+    isVerifying: true,
   };
 
   componentDidMount() {
@@ -41,7 +41,7 @@ class App extends React.Component {
         .then(({ user }) => this.updateUser(user))
         .catch((errors) => console.log(errors));
     } else {
-      this.setState({ isVerifying: false })
+      this.setState({ isVerifying: false });
     }
   }
   updateUser = (user) => {
@@ -50,27 +50,29 @@ class App extends React.Component {
   };
 
   render() {
-    if(this.state.isVerifying) {
-      return <FullPageLoader />
+    if (this.state.isVerifying) {
+      return <FullPageLoader />;
     }
     return (
       <Router>
         <Header isLoggedIn={this.state.isLoggedIn} user={this.state.user} />
-        {
-          this.state.isLoggedIn ? <AuthenticatedApp /> : <UnAuthenticatedApp updateUser={this.updateUser} />
-        }
+        {this.state.isLoggedIn ? (
+          <AuthenticatedApp {...this.state} />
+        ) : (
+          <UnAuthenticatedApp updateUser={this.updateUser} />
+        )}
       </Router>
     );
   }
 }
-function AuthenticatedApp() {
+function AuthenticatedApp(props) {
   return (
     <Switch>
       <Route path="/" exact>
         <Home />
       </Route>
       <Route path="/articles" exact>
-        <ArticlesHome />
+        <ArticlesHome {...props} />
       </Route>
       <Route path="/articles/:slug" component={Article} />
       <Route path="/new-article" exact>
@@ -86,31 +88,30 @@ function AuthenticatedApp() {
         <NotFound />
       </Route>
     </Switch>
-
-  )
+  );
 }
 
 function UnAuthenticatedApp(props) {
   return (
     <Switch>
-    <Route path="/" exact>
-      <Home />
-    </Route>
-    <Route path="/register" exact>
-      <Signup updateUser={props.updateUser} />
-    </Route>
-    <Route path="/login" exact>
-      <Login updateUser={props.updateUser} />
-    </Route>
-    <Route path="/articles" exact>
-      <ArticlesHome />
-    </Route>
-    <Route path="/articles/:slug" component={Article} />
-    <Route path="*">  
-      <NotFound />
-    </Route>
-  </Switch>
-  )
+      <Route path="/" exact>
+        <Home />
+      </Route>
+      <Route path="/register" exact>
+        <Signup updateUser={props.updateUser} />
+      </Route>
+      <Route path="/login" exact>
+        <Login updateUser={props.updateUser} />
+      </Route>
+      <Route path="/articles" exact>
+        <ArticlesHome {...props} />
+      </Route>
+      <Route path="/articles/:slug" component={Article} />
+      <Route path="*">
+        <NotFound />
+      </Route>
+    </Switch>
+  );
 }
 
 export default App;
