@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { validations } from '../utilities/validations';
+import { loginURL } from '../utilities/constants';
+import { withRouter } from 'react-router';
 
 class Login extends React.Component {
   constructor(props) {
@@ -23,8 +25,48 @@ class Login extends React.Component {
   };
 
   handleSubmit = (event) => {
+    let { email, password } = this.state;
     event.preventDefault();
-  };
+    if (password && email) {
+      fetch(loginURL, {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        },
+        body: JSON.stringify({ user: { password: password, email } }),
+      })
+        .then((res) => {
+          if (!res.ok) {
+            return res.json().then(({ errors }) => {
+              return Promise.reject(errors);
+            });
+          }
+          return res.json();
+        })
+        .then(({ user }) => {
+          console.log(user);
+          this.props.updateUser(user);
+          this.setState({ password: '', email: '' });
+          this.props.history.push('/articles');
+        })
+        .catch((error) => { 
+          this.setState((prevState) => {
+          return {
+            ...prevState,
+            errors: {
+              ...prevState.errors,
+              email: "Email or Password is incorrect!",
+            },
+          };
+        });
+      });
+  }
+}
+
+
+  // handleLocalStorage = (user) => {
+  //   localStorage.setItem('userInfo', JSON.stringify(user));
+  // };
 
   render() {
     let { email, password } = this.state.errors;
@@ -79,4 +121,4 @@ class Login extends React.Component {
   }
 }
 
-export default Login;
+export default withRouter(Login);
