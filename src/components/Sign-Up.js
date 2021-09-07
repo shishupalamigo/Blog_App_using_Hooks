@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { registerURL } from '../utilities/constants';
 import { validations } from '../utilities/validations';
+import { withRouter } from "react-router";
 
 class Signup extends React.Component {
   constructor(props) {
@@ -46,12 +47,13 @@ class Signup extends React.Component {
         }
         return res.json();
       })
-      .then((data) => {
-        console.log(data);
-        this.props.handleUser(data.user);
+      .then(({user}) => {
+        console.log(user);
+        this.props.updateUser(user);
+        this.setState({password: "", email: "", username: "", errors})
         this.props.history.push("/login");
     })
-    .catch((err) => this.setState({password: "", email: "", username: "", errors}));
+    .catch((errors) => this.setState({errors}));
     }
   };
 
@@ -117,4 +119,4 @@ class Signup extends React.Component {
   }
 }
 
-export default Signup;
+export default withRouter(Signup);

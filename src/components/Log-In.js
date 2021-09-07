@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { validations } from '../utilities/validations';
 import { loginURL } from '../utilities/constants';
+import { withRouter } from 'react-router';
 
 class Login extends React.Component {
   constructor(props) {
@@ -24,39 +25,48 @@ class Login extends React.Component {
   };
 
   handleSubmit = (event) => {
-    let {email, password, errors} = this.state;
+    let { email, password } = this.state;
     event.preventDefault();
-    if(password && email) {
+    if (password && email) {
       fetch(loginURL, {
-          method: "POST",
-          headers: {
-            "Content-type": "application/json; charset=UTF-8"
-          },
-          body: JSON.stringify({user: {password: password, email}}),
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        },
+        body: JSON.stringify({ user: { password: password, email } }),
       })
-      .then((res) => {
-          if(!res.ok) {
-              return res.json().then((data) => {
-                for (let key in data.errors) {
-                  errors[key] = `${key} ${data.errors[key]}`;  
-                }
-                return Promise.reject(errors)   
-             });
+        .then((res) => {
+          if (!res.ok) {
+            return res.json().then(({ errors }) => {
+              return Promise.reject(errors);
+            });
           }
           return res.json();
-      })
-      .then((data) => {
-          console.log(data);
-          this.props.handleUser(data.user);
-          this.props.history.push("/");
-      })
-      .catch((err) => this.setState({password: "", email: "", errors}));
+        })
+        .then(({ user }) => {
+          console.log(user);
+          this.props.updateUser(user);
+          this.setState({ password: '', email: '' });
+          this.props.history.push('/articles');
+        })
+        .catch((error) => { 
+          this.setState((prevState) => {
+          return {
+            ...prevState,
+            errors: {
+              ...prevState.errors,
+              email: "Email or Password is incorrect!",
+            },
+          };
+        });
+      });
   }
-  };
+}
 
-  handleLocalStorage = (user) => {
-    localStorage.setItem("userInfo", JSON.stringify(user));
-  }
+
+  // handleLocalStorage = (user) => {
+  //   localStorage.setItem('userInfo', JSON.stringify(user));
+  // };
 
   render() {
     let { email, password } = this.state.errors;
@@ -111,4 +121,4 @@ class Login extends React.Component {
   }
 }
 
-export default Login;
+export default withRouter(Login);

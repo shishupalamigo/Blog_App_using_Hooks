@@ -46,7 +46,6 @@ class ArticlesHome extends React.Component {
         return res.json();
       })
       .then((data) => {
-        console.log(data);
         this.setState({
           articles: data.articles,
           articlesCount: data.articlesCount,
