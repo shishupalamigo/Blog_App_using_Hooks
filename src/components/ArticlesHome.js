@@ -70,11 +70,11 @@ class ArticlesHome extends React.Component {
   myFeed = () => {
     let offset = (this.state.activePageIndex - 1) * 10;
     let token = localStorage[localStorageKey];
-    let bearer = 'Bearer ' + token;
-    fetch(feedURL + `?/limit=${this.state.activePageIndex}&skip=${offset}`, {
+    // let bearer = 'Bearer ' + token;
+    fetch(feedURL + `?/limit=${this.state.articlesPerPage}&skip=${offset}`, {
       method: 'GET',
       headers: {
-        Authorization: bearer,
+        Authorization: `Bearer ${token}`,
         'Content-type': 'application/json',
       },
     })
@@ -85,6 +85,7 @@ class ArticlesHome extends React.Component {
         return res.json();
       })
       .then((data) => {
+        console.log(data ,"from my feed");
         this.setState({
           articles: data.articles,
           articlesCount: data.articlesCount,

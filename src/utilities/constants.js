@@ -7,7 +7,8 @@ const loginURL = ROOT_URL + 'users/login';
 const registerURL = ROOT_URL + 'users';
 const UserVerifyURL = ROOT_URL + 'user';
 const feedURL = ROOT_URL + "articles/feed";
+const profileURL = ROOT_URL + "profiles/";
 
 const localStorageKey = "app_user"
 
-export { ROOT_URL, ArticlesURL, TagsURL, loginURL, registerURL, localStorageKey, UserVerifyURL, feedURL };
+export { ROOT_URL, ArticlesURL, TagsURL, loginURL, registerURL, localStorageKey, UserVerifyURL, feedURL, profileURL };

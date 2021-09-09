@@ -49,24 +49,19 @@ class Login extends React.Component {
           this.setState({ password: '', email: '' });
           this.props.history.push('/articles');
         })
-        .catch((error) => { 
+        .catch((error) => {
           this.setState((prevState) => {
-          return {
-            ...prevState,
-            errors: {
-              ...prevState.errors,
-              email: "Email or Password is incorrect!",
-            },
-          };
+            return {
+              ...prevState,
+              errors: {
+                ...prevState.errors,
+                email: 'Email or Password is incorrect!',
+              },
+            };
+          });
         });
-      });
-  }
-}
-
-
-  // handleLocalStorage = (user) => {
-  //   localStorage.setItem('userInfo', JSON.stringify(user));
-  // };
+    }
+  };
 
   render() {
     let { email, password } = this.state.errors;

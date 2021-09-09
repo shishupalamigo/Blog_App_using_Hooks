@@ -48,6 +48,10 @@ class App extends React.Component {
     this.setState({ isLoggedIn: true, user, isVerifying: false });
     localStorage.setItem(localStorageKey, user.token);
   };
+  handleLogout = () => {
+    this.setState({isLoggedIn: false, user: null});
+    window.location.href = "/articles";
+}
 
   render() {
     if (this.state.isVerifying) {
@@ -55,9 +59,9 @@ class App extends React.Component {
     }
     return (
       <Router>
-        <Header isLoggedIn={this.state.isLoggedIn} user={this.state.user} />
+        <Header {...this.state} handleLogout={this.handleLogout} />
         {this.state.isLoggedIn ? (
-          <AuthenticatedApp {...this.state} />
+          <AuthenticatedApp {...this.state} handleUser={this.handleUser} />
         ) : (
           <UnAuthenticatedApp updateUser={this.updateUser} />
         )}
@@ -79,10 +83,10 @@ function AuthenticatedApp(props) {
         <NewArticle />
       </Route>
       <Route path="/settings" exact>
-        <Settings />
+        <Settings user={props.user} handleUser={props.handleUser}/>
       </Route>
-      <Route path="/profile" exact>
-        <Profile />
+      <Route path="/profiles/:id" exact>
+        <Profile user={props.user}/>
       </Route>
       <Route path="*">
         <NotFound />
