@@ -1,7 +1,7 @@
 import React from 'react';
 import { validations } from '../utilities/validations';
 import { localStorageKey, UserVerifyURL } from '../utilities/constants';
-import { withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router';
 
 class Settings extends React.Component {
   constructor(props) {
@@ -54,8 +54,6 @@ class Settings extends React.Component {
           return res.json();
         })
         .then((data) => {
-          // console.log(data, "from settings");
-          this.props.handleUser(data.user);
           this.props.history.push(`/profiles/${data.user.username}`);
         })
         .catch((err) => this.setState({ errors }));

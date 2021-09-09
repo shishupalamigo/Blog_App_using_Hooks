@@ -1,10 +1,11 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, withRouter } from 'react-router-dom';
 import { localStorageKey } from '../utilities/constants';
 
 function Header(props) {
   function handleLogout() {
     localStorage.removeItem(localStorageKey);
     props.handleLogout();
+    props.history.push("/articles")
   }
   return (
     <header className="flex justify-between bg-green-50 px-20 py-8">
@@ -32,7 +33,7 @@ function AuthHeader(props) {
           user: props.user,
           pathname: `/profiles/${props.user.username}`,
         }}
-        className="btn mr-5 bg-yellow-200"
+        className="btn mr-5 bg-yellow-100 transform transition duration-500 hover:scale-105"
       >
         <li className="flex items-center text-xl mx-3">
           <img
@@ -40,7 +41,7 @@ function AuthHeader(props) {
             alt={props.user.username}
             className="w-5 h-5 rounded-full"
           />
-          <span className="">{props.user.username}</span>
+          <span className="ml-2 text-gray-600 font-thin">{props.user.username}</span>
         </li>
       </NavLink>
       <NavLink
@@ -56,13 +57,6 @@ function AuthHeader(props) {
         className="btn btn-green mr-5"
       >
         New Article
-      </NavLink>
-      <NavLink
-        to="/settings"
-        activeClassName="btn-active"
-        className="btn btn-green mr-5"
-      >
-        Settings
       </NavLink>
       <button className="btn btn-green" onClick={props.handleLogout}>
         Logout
@@ -98,4 +92,4 @@ function NonAuthHeader(props) {
   );
 }
 
-export default Header;
+export default withRouter(Header);

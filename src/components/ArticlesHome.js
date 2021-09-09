@@ -20,11 +20,11 @@ class ArticlesHome extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.isLoggedIn) {
-      this.setState({ feedSelected: 'myfeed' }, this.myFeed);
-    } else {
-      this.setState({ feedSelected: 'global' }, this.getArticles);
-    }
+    // if (this.props.isLoggedIn) {
+    //   this.setState({ feedSelected: 'myfeed' }, this.myFeed);
+    // } else {
+    // }
+    this.setState({ feedSelected: 'global' }, this.getArticles);
   }
   componentDidUpdate(_prevProps, prevState) {
     if (
@@ -70,7 +70,6 @@ class ArticlesHome extends React.Component {
   myFeed = () => {
     let offset = (this.state.activePageIndex - 1) * 10;
     let token = localStorage[localStorageKey];
-    // let bearer = 'Bearer ' + token;
     fetch(feedURL + `?/limit=${this.state.articlesPerPage}&skip=${offset}`, {
       method: 'GET',
       headers: {
@@ -85,7 +84,7 @@ class ArticlesHome extends React.Component {
         return res.json();
       })
       .then((data) => {
-        console.log(data ,"from my feed");
+        // console.log(data ,"from my feed");
         this.setState({
           articles: data.articles,
           articlesCount: data.articlesCount,
@@ -112,25 +111,12 @@ class ArticlesHome extends React.Component {
       <main className="px-24 py-16 w-full">
         {/* feeds part */}
         <div className="flex mb-3">
-          <span
-            className={
-              !this.props.isLoggedIn
-                ? 'hidden'
-                : feedSelected === 'myfeed'
-                ? 'text-xl mr-8 cursor-pointer text-green-500'
-                : 'text-xl mr-8 cursor-pointer green'
-            }
-            onClick={this.myFeed}
-          >
-            {' '}
-            <i className="fas fa-newspaper mr-2"></i>
-            My feed
-          </span>
+
           <span
             className={
               feedSelected === 'global'
-                ? 'cursor-pointer text-xl text-green-500'
-                : 'cursor-pointer text-xl'
+                ? 'cursor-pointer mr-8 text-xl text-green-500'
+                : 'cursor-pointer mr-8 text-xl'
             }
             onClick={() =>
               this.setState(
@@ -144,6 +130,20 @@ class ArticlesHome extends React.Component {
           >
             <i className="fas fa-newspaper mr-2"></i>
             Global Feed
+          </span>
+          <span
+            className={
+              !this.props.isLoggedIn
+                ? 'hidden'
+                : feedSelected === 'myfeed'
+                ? 'text-xl mr-8 cursor-pointer text-green-500'
+                : 'text-xl  cursor-pointer green'
+            }
+            onClick={this.myFeed}
+          >
+            {' '}
+            <i className="fas fa-newspaper mr-2"></i>
+            My feed
           </span>
           <div
             className={this.state.tagSelected ? 'visible text-xl' : 'hidden'}

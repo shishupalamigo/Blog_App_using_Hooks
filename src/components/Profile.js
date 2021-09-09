@@ -3,7 +3,7 @@ import Loader from './Loader';
 import { ArticlesURL, profileURL } from '../utilities/constants';
 import Articles from './Articles';
 import Pagination from './Pagination';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 
 class Profile extends React.Component {
   constructor(props) {
@@ -24,14 +24,11 @@ class Profile extends React.Component {
   }
 
   getUserInfo = () => {
-    // console.log(this.props.);
-    let {id} = this.props.match.params;
-    // let { username } = this.props.user;
-    // console.log(username);
+    let { id } = this.props.match.params;
     fetch(profileURL + id)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
+        // console.log(data);
         this.setState({ user: data.profile }, this.getArticles);
       });
   };
@@ -78,7 +75,7 @@ class Profile extends React.Component {
       return <Loader />;
     }
     let { username, image, bio } = this.state.user;
-    let loggenInUser = this.props.user.username;
+    let loggedInUser = this.props?.user?.username;
     let {
       articles,
       error,
@@ -90,23 +87,26 @@ class Profile extends React.Component {
     return (
       <main>
         <section>
-          <div className="bg-articlePage text-white py-16 text-center">
+          <div className="bg-indigo-200 text-white py-16 text-center">
             <img
               src={image}
               alt={username}
               className="w-40 h-40 rounded-full mx-auto"
             />
-            <h2 className="text-5xl my-4">{username}</h2>
-            <h3 className="text-2xl text-pink-300">{bio}</h3>
-            <button
-              className={
-                loggenInUser !== username
-                  ? 'visible bg-white text-gray-700 px-8 py-3 rounded-md mt-6'
-                  : 'hidden'
-              }
-            >
-              Follow
-            </button>
+            <h2 className="text-4xl my-4 text-gray-700">{username}</h2>
+            <h3 className="text-2xl text-yellow-500 mb-5">{bio}</h3>
+            <div className="float-right mr-10 ">
+            {loggedInUser !== username && (
+              <button className="bg-blue-300 text-gray-700 btn rounded-full hover:bg-blue-400 transform transition duration-500 hover:scale-105">
+              <i class="fas fa-plus mr-2"></i>Follow
+              </button>
+            )}
+            {loggedInUser === username && (
+              <Link to="/settings" className="btn bg-gray-200 text-gray-600 hover:bg-yellow-200">
+                <i class="fas fa-user-edit mr-2"></i>Edit Profile
+              </Link>
+            )}
+            </div>
           </div>
 
           <article className="px-40">
@@ -128,7 +128,7 @@ class Profile extends React.Component {
                 }
               >
                 <i className="fas fa-newspaper mr-2"></i>
-                My Articles
+                Articles written
               </span>
               <span className="mx-4">/</span>
               <span

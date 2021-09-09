@@ -35,11 +35,13 @@ function Articles(props) {
           >
             <div className="flex justify-between w-full">
                 <div className="flex items-center my-2">
+                  <Link to={`/profiles/${article.author.username}`}> 
                   <img
                     src={article.author.image || 'smiley.png'}
                     alt={article.author.username}
                     className="w-14 h-14 rounded-full object-cover"
                   />
+                  </Link>
                   <div className="ml-4">
                     <h5 className="text-indigo-900 font-bold text-xl mr-5">
                       {article.author.username}
