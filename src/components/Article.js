@@ -1,5 +1,6 @@
 import React from "react";
 import Loader from "./Loader";
+import { Link } from "react-router-dom";
 import { ArticlesURL } from "../utilities/constants";
 
 class Article extends React.Component{
@@ -25,7 +26,7 @@ class Article extends React.Component{
             return res.json();
         })
         .then((data) => {
-            console.log(data);
+            // console.log(data);
             this.setState({article: data.article });
         })
         .catch((err) => {
@@ -56,7 +57,9 @@ class Article extends React.Component{
                     <h2 className="mt-2 mb-3 text-4xl">{article.title}</h2>
                     <p className="">{article.description}</p>
                     <div className="flex py-6 items-center">
+                        <Link to={`/profiles/${article.author.username}`}>
                         <img src={article.author.image} alt={article.author.username} className="w-16 h-16 object-cover rounded-full"/>
+                        </Link>
                         <span className="mx-3">{article.author.username}</span>
                         <span className="mx-3">{this.getDate(article.createdAt)}</span>
                     </div>
