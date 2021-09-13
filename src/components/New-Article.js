@@ -44,11 +44,11 @@ class NewArticle extends React.Component {
           return res.json();
         })
         .then((data) => {
-          console.log(data);
+          // console.log(data);
           this.props.history.push(`/articles/${data.article.slug}`);
         })
         .catch((err) => {
-          console.log(err);
+          // console.log(err);
           this.setState({
             title: '',
             description: '',
@@ -106,14 +106,6 @@ class NewArticle extends React.Component {
               name="tags"
               onChange={(e) => this.handleChange(e)}
             ></input>
-            {/* <textarea
-              name="body"
-              className="block w-full h-40 my-3 py-2 px-3 border border-gray-400 rounded-md"
-              placeholder="Article..."
-              value={this.state.body}
-              data-provide="markdown"
-              onChange={(e) => this.handleChange(e)}
-            /> */}
             <MdEditor
               style={{ height: '500px' }}
               renderHTML={(text) => mdParser.render(text)}
@@ -123,7 +115,7 @@ class NewArticle extends React.Component {
             <input
               type="submit"
               value="Publish Article"
-              className="block w-full btn bg-green-500 text-white font-bold cursor-pointer"
+              className="block float-right btn bg-green-500 text-white font-bold cursor-pointer mt-10"
             />
           </form>
         </section>
