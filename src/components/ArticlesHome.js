@@ -20,11 +20,11 @@ class ArticlesHome extends React.Component {
   }
 
   componentDidMount() {
-    // if (this.props.isLoggedIn) {
-    //   this.setState({ feedSelected: 'myfeed' }, this.myFeed);
-    // } else {
-    // }
-    this.setState({ feedSelected: 'global' }, this.getArticles);
+    if (this.props.isLoggedIn) {
+      this.setState({ feedSelected: 'myfeed' }, this.myFeed);
+    } else {
+      this.setState({ feedSelected: 'global' }, this.getArticles);
+    }
   }
   componentDidUpdate(_prevProps, prevState) {
     if (
@@ -39,11 +39,18 @@ class ArticlesHome extends React.Component {
   };
 
   getArticles = () => {
-    let limit = this.state.articlesPerPage;
+    let limit = this.state.articlesPerPage; 
     let offset = (this.state.activePageIndex - 1) * 10;
     let tag = this.state.tagSelected;
+    let token = localStorage[localStorageKey];
     fetch(
-      ArticlesURL + `/?offset=${offset}&limit=${limit}` + (tag && `&tag=${tag}`)
+      ArticlesURL + `/?offset=${offset}&limit=${limit}` + (tag && `&tag=${tag}`), {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-type': 'application/json',
+        },
+      }
     )
       .then((res) => {
         if (!res.ok) {
@@ -52,6 +59,7 @@ class ArticlesHome extends React.Component {
         return res.json();
       })
       .then((data) => {
+        console.log({data})
         this.setState({
           articles: data.articles,
           articlesCount: data.articlesCount,
@@ -95,6 +103,36 @@ class ArticlesHome extends React.Component {
 
       .catch((err) => this.setState({ error: 'Not able to fetch Articles' }));
   };
+  handleFavorite = ({ target }) => {
+    let { id, slug } = target.dataset;
+    let method = id === 'false' ? 'POST' : 'DELETE';
+    console.log(method);
+    console.log(id, slug);
+    if (this.props.isLoggedIn) {
+      fetch(ArticlesURL + '/' + slug + '/favorite', {
+        method: method,
+        headers: {
+          Authorization: 'Token ' + localStorage[localStorageKey],
+        },
+      })
+        .then((res) => {
+          if (!res.ok) {
+            return res.json().then(({ errors }) => {
+              return Promise.reject(errors);
+            });
+          }
+          return res.json();
+        })
+        .then((data) => {
+          if (this.state.feedSelected === 'myfeed') {
+            this.myFeed();
+          } else {
+            this.getArticles();
+          }
+        })
+        .catch((err) => console.log(err));
+    }
+  };
 
   render() {
     let {
@@ -111,7 +149,6 @@ class ArticlesHome extends React.Component {
       <main className="px-24 py-16 w-full">
         {/* feeds part */}
         <div className="flex mb-3">
-
           <span
             className={
               feedSelected === 'global'
@@ -156,7 +193,12 @@ class ArticlesHome extends React.Component {
         {/* articles part */}
         <section className="flex justify-between ">
           <div className="w-4/6">
-            <Articles articles={articles} error={error} />
+            <Articles
+              articles={articles}
+              error={error}
+              isLoggedIn={this.props.isLoggedIn}
+              handleFavorite={this.handleFavorite}
+            />
           </div>
 
           {/* tags part */}

@@ -10,6 +10,7 @@ import NewArticle from './components/New-Article';
 import Settings from './components/Settings';
 import Profile from './components/Profile';
 import FullPageLoader from './components/FullPageLoader';
+import UpdateArticle from './components/UpdateArticle';
 import NotFound from './components/NotFound';
 
 import { localStorageKey, UserVerifyURL } from './utilities/constants';
@@ -54,7 +55,7 @@ class App extends React.Component {
 
   render() {
     if (this.state.isVerifying) {
-      console.log("Is Verifying");
+      console.log('Is Verifying');
       return <FullPageLoader />;
     }
     return (
@@ -78,7 +79,12 @@ function AuthenticatedApp(props) {
       <Route path="/articles" exact>
         <ArticlesHome {...props} />
       </Route>
-      <Route path="/articles/:slug" component={Article} />
+      <Route path="/articles/edit/:slug">
+        <UpdateArticle />
+      </Route>
+      <Route path="/articles/:slug">
+        <Article {...props} />
+      </Route>
       <Route path="/new-article" exact>
         <NewArticle />
       </Route>
@@ -110,7 +116,9 @@ function UnAuthenticatedApp(props) {
       <Route path="/articles" exact>
         <ArticlesHome {...props} />
       </Route>
-      <Route path="/articles/:slug" component={Article} />
+      <Route path="/articles/:slug">
+        <Article {...props} />
+      </Route>
       <Route path="/profiles/:id" exact>
         <Profile user={props.user} />
       </Route>
