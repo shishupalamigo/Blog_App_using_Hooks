@@ -39,11 +39,18 @@ class ArticlesHome extends React.Component {
   };
 
   getArticles = () => {
-    let limit = this.state.articlesPerPage;
+    let limit = this.state.articlesPerPage; 
     let offset = (this.state.activePageIndex - 1) * 10;
     let tag = this.state.tagSelected;
+    let token = localStorage[localStorageKey];
     fetch(
-      ArticlesURL + `/?offset=${offset}&limit=${limit}` + (tag && `&tag=${tag}`)
+      ArticlesURL + `/?offset=${offset}&limit=${limit}` + (tag && `&tag=${tag}`), {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-type': 'application/json',
+        },
+      }
     )
       .then((res) => {
         if (!res.ok) {
@@ -52,6 +59,7 @@ class ArticlesHome extends React.Component {
         return res.json();
       })
       .then((data) => {
+        console.log({data})
         this.setState({
           articles: data.articles,
           articlesCount: data.articlesCount,
@@ -116,7 +124,11 @@ class ArticlesHome extends React.Component {
           return res.json();
         })
         .then((data) => {
-          this.getArticles();
+          if (this.state.feedSelected === 'myfeed') {
+            this.myFeed();
+          } else {
+            this.getArticles();
+          }
         })
         .catch((err) => console.log(err));
     }

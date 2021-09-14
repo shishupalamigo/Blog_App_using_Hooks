@@ -1,6 +1,10 @@
 import React from 'react';
 import Loader from './Loader';
-import { ArticlesURL, profileURL, localStorageKey } from '../utilities/constants';
+import {
+  ArticlesURL,
+  profileURL,
+  localStorageKey,
+} from '../utilities/constants';
 import Articles from './Articles';
 import Pagination from './Pagination';
 import { withRouter, Link } from 'react-router-dom';
@@ -25,29 +29,31 @@ class Profile extends React.Component {
     this.getUserInfo();
   }
 
-
   getUserInfo = () => {
-    let {id} = this.props.match.params;
+    let { id } = this.props.match.params;
     fetch(profileURL + id, {
-        method: "GET",
-        headers: {
-            "Authorization": "Bearer " + localStorage[localStorageKey]
-        }
+      method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + localStorage[localStorageKey],
+      },
     })
-    .then((res => {
-        if(!res.ok) {
-            return res.json().then(({errors}) => {
-                return Promise.reject();
-            })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then(({ errors }) => {
+            return Promise.reject();
+          });
         }
         return res.json();
-    }))
-    .then(({profile}) => {
-        console.log({profile});
-        this.setState({user: profile, following: profile.following}, this.getArticles)
-    })
-    .catch((err) => console.log(err));
-}
+      })
+      .then(({ profile }) => {
+        console.log({ profile });
+        this.setState(
+          { user: profile, following: profile.following },
+          this.getFeedArticles
+        );
+      })
+      .catch((err) => console.log(err));
+  };
 
   componentDidUpdate() {
     let user = this.state.user;
@@ -59,15 +65,22 @@ class Profile extends React.Component {
 
   handleClick = ({ target }) => {
     let { id } = target.dataset;
-    this.setState({ activePage: id }, this.getArticles);
+    this.setState({ activePage: id }, this.getFeedArticles);
   };
 
-  getArticles = () => {
+  getFeedArticles = () => {
     let { username } = this.state.user;
     let offset = (this.state.activePage - 1) * 10;
+    let token = localStorage[localStorageKey];
 
     fetch(
-      `${ArticlesURL}?${this.state.feedSelected}=${username}&limit=${this.state.articlesPerPage}&offset=${offset}`
+      `${ArticlesURL}?${this.state.feedSelected}=${username}&limit=${this.state.articlesPerPage}&offset=${offset}` , {
+        method : "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-type': 'application/json',
+        },        
+      }
     )
       .then((res) => {
         if (!res.ok) {
@@ -87,51 +100,54 @@ class Profile extends React.Component {
   };
   handleFollow = () => {
     this.getUserInfo();
-    let { username} = this.state.user;
-    let { following } = this.state;  
-    let method = following ? "DELETE" : 'POST';
-    fetch(profileURL +  "/" + username + "/follow", {
+    let { username } = this.state.user;
+    let { following } = this.state;
+    let method = following ? 'DELETE' : 'POST';
+    fetch(profileURL + '/' + username + '/follow', {
       method: method,
-      headers : {
-        "Authorization" : "Bearer " + localStorage[localStorageKey]
-      }
-    }).then(res => {
-      if(!res.ok) {
-        return res.json().then(({errors}) => {
-          return Promise.reject();
+      headers: {
+        Authorization: 'Bearer ' + localStorage[localStorageKey],
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then(({ errors }) => {
+            return Promise.reject();
+          });
+        }
+        return res.json();
       })
-      } 
-      return res.json();
-    }).then(({profile}) => {
-      console.log(profile);
-      this.setState({following: profile.following})
-    }).catch(err => console.log(err))
-  }
-  
-  handleFavorite = ({target}) => {
-    let {id, slug} = target.dataset;
-    let method = id === "false" ? "POST" : "DELETE";
+      .then(({ profile }) => {
+        console.log(profile);
+        this.setState({ following: profile.following });
+      })
+      .catch((err) => console.log(err));
+  };
+
+  handleFavorite = ({ target }) => {
+    let { id, slug } = target.dataset;
+    let method = id === 'false' ? 'POST' : 'DELETE';
     console.log(method);
     console.log(id, slug);
-        fetch(ArticlesURL + "/" + slug + "/favorite", {
-            method: method,
-            headers: {
-                "Authorization": "Token " + localStorage[localStorageKey]
-            }
-        })
-        .then((res) => {
-            if(!res.ok) {
-                return res.json().then(({errors}) => {
-                    return Promise.reject(errors);
-                })  
-            }
-            return res.json();
-        })
-        .then((data) => {
-            this.getArticles();
-        })
-        .catch((err) => console.log(err));
-    }
+    fetch(ArticlesURL + '/' + slug + '/favorite', {
+      method: method,
+      headers: {
+        Authorization: 'Token ' + localStorage[localStorageKey],
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then(({ errors }) => {
+            return Promise.reject(errors);
+          });
+        }
+        return res.json();
+      })
+      .then((data) => {
+        this.getFeedArticles();
+      })
+      .catch((err) => console.log(err));
+  };
 
   render() {
     if (!this.state.user) {
@@ -146,7 +162,7 @@ class Profile extends React.Component {
       activePage,
       articlesPerPage,
       feedSelected,
-      following
+      following,
     } = this.state;
     return (
       <main>
@@ -160,16 +176,23 @@ class Profile extends React.Component {
             <h2 className="text-4xl my-4 text-gray-700">{username}</h2>
             <h3 className="text-2xl text-yellow-500 mb-5">{bio}</h3>
             <div className="float-right mr-10 ">
-            {loggedInUser !== username && (
-              <button className="bg-blue-300 text-gray-700 btn rounded-full hover:bg-blue-400 transform transition duration-500 hover:scale-105" onClick={this.handleFollow}>
-              <i className="fas fa-plus mr-2"></i>{!following ? "follow" : "unfollow"}
-              </button>
-            )}
-            {loggedInUser === username && (
-              <Link to="/settings" className="btn bg-gray-200 text-gray-600 hover:bg-yellow-200">
-                <i className="fas fa-user-edit mr-2"></i>Edit Profile
-              </Link>
-            )}
+              {loggedInUser !== username && (
+                <button
+                  className="bg-blue-300 text-gray-700 btn rounded-full hover:bg-blue-400 transform transition duration-500 hover:scale-105"
+                  onClick={this.handleFollow}
+                >
+                  <i className="fas fa-plus mr-2"></i>
+                  {!following ? 'follow' : 'unfollow'}
+                </button>
+              )}
+              {loggedInUser === username && (
+                <Link
+                  to="/settings"
+                  className="btn bg-gray-200 text-gray-600 hover:bg-yellow-200"
+                >
+                  <i className="fas fa-user-edit mr-2"></i>Edit Profile
+                </Link>
+              )}
             </div>
           </div>
 
@@ -187,7 +210,7 @@ class Profile extends React.Component {
                       feedSelected: 'author',
                       activePage: 1,
                     },
-                    this.getArticles
+                    this.getFeedArticles
                   )
                 }
               >
@@ -207,7 +230,7 @@ class Profile extends React.Component {
                       feedSelected: 'favorited',
                       activePage: 1,
                     },
-                    this.getArticles
+                    this.getFeedArticles
                   )
                 }
               >
@@ -216,7 +239,12 @@ class Profile extends React.Component {
               </span>
             </div>
             <div className="">
-              <Articles articles={articles} error={error} isLoggedIn={this.props.isLoggedIn} handleFavorite={this.handleFavorite} />
+              <Articles
+                articles={articles}
+                error={error}
+                isLoggedIn={this.props.isLoggedIn}
+                handleFavorite={this.handleFavorite}
+              />
             </div>
           </article>
           <div className="text-center py-8">
