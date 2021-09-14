@@ -37,7 +37,7 @@ function AuthHeader(props) {
       >
         <li className="flex items-center text-xl mx-3">
           <img
-            src={props.user.image}
+            src={props.user.image || "smiley.png"} 
             alt={props.user.username}
             className="w-5 h-5 rounded-full"
           />
