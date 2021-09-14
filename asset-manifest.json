@@ -1,0 +1,23 @@
+{
+  "files": {
+    "main.css": "/react-blog-app/static/css/main.fb64ba53.chunk.css",
+    "main.js": "/react-blog-app/static/js/main.43d6fef2.chunk.js",
+    "main.js.map": "/react-blog-app/static/js/main.43d6fef2.chunk.js.map",
+    "runtime-main.js": "/react-blog-app/static/js/runtime-main.aea67cd9.js",
+    "runtime-main.js.map": "/react-blog-app/static/js/runtime-main.aea67cd9.js.map",
+    "static/css/2.053fa5b4.chunk.css": "/react-blog-app/static/css/2.053fa5b4.chunk.css",
+    "static/js/2.7f8e3d40.chunk.js": "/react-blog-app/static/js/2.7f8e3d40.chunk.js",
+    "static/js/2.7f8e3d40.chunk.js.map": "/react-blog-app/static/js/2.7f8e3d40.chunk.js.map",
+    "index.html": "/react-blog-app/index.html",
+    "static/css/2.053fa5b4.chunk.css.map": "/react-blog-app/static/css/2.053fa5b4.chunk.css.map",
+    "static/css/main.fb64ba53.chunk.css.map": "/react-blog-app/static/css/main.fb64ba53.chunk.css.map",
+    "static/js/2.7f8e3d40.chunk.js.LICENSE.txt": "/react-blog-app/static/js/2.7f8e3d40.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.aea67cd9.js",
+    "static/css/2.053fa5b4.chunk.css",
+    "static/js/2.7f8e3d40.chunk.js",
+    "static/css/main.fb64ba53.chunk.css",
+    "static/js/main.43d6fef2.chunk.js"
+  ]
+}
