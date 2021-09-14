@@ -18,7 +18,7 @@ class Profile extends React.Component {
       articles: null,
       articlesCount: null,
       articlesPerPage: 10,
-      activePage: 1,
+      activePageIndex: 1,
       feedSelected: 'author',
       following: '',
       error: '',
@@ -65,21 +65,26 @@ class Profile extends React.Component {
 
   handleClick = ({ target }) => {
     let { id } = target.dataset;
-    this.setState({ activePage: id }, this.getFeedArticles);
+    this.setState({ activePageIndex: id }, this.getFeedArticles);
+  };
+
+  updateCurrentPageIndex = (index) => {
+    this.setState({ activePageIndex: index }, this.getFeedArticles);
   };
 
   getFeedArticles = () => {
     let { username } = this.state.user;
-    let offset = (this.state.activePage - 1) * 10;
+    let offset = (this.state.activePageIndex - 1) * 10;
     let token = localStorage[localStorageKey];
 
     fetch(
-      `${ArticlesURL}?${this.state.feedSelected}=${username}&limit=${this.state.articlesPerPage}&offset=${offset}` , {
-        method : "GET",
+      `${ArticlesURL}?${this.state.feedSelected}=${username}&limit=${this.state.articlesPerPage}&offset=${offset}`,
+      {
+        method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-type': 'application/json',
-        },        
+        },
       }
     )
       .then((res) => {
@@ -159,7 +164,7 @@ class Profile extends React.Component {
       articles,
       error,
       articlesCount,
-      activePage,
+      activePageIndex,
       articlesPerPage,
       feedSelected,
       following,
@@ -208,7 +213,7 @@ class Profile extends React.Component {
                   this.setState(
                     {
                       feedSelected: 'author',
-                      activePage: 1,
+                      activePageIndex: 1,
                     },
                     this.getFeedArticles
                   )
@@ -228,7 +233,7 @@ class Profile extends React.Component {
                   this.setState(
                     {
                       feedSelected: 'favorited',
-                      activePage: 1,
+                      activePageIndex: 1,
                     },
                     this.getFeedArticles
                   )
@@ -247,12 +252,13 @@ class Profile extends React.Component {
               />
             </div>
           </article>
-          <div className="text-center py-8">
+          <div className="text-center py-8 flex justify-center">
             <Pagination
               articlesCount={articlesCount}
               articlesPerPage={articlesPerPage}
-              activePage={activePage}
+              activePageIndex={activePageIndex}
               handleClick={this.handleClick}
+              updateCurrentPageIndex={this.updateCurrentPageIndex}
             />
           </div>
         </section>
