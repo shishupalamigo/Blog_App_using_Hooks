@@ -1,7 +1,7 @@
 import React from 'react';
 import Articles from './Articles';
 import Tags from './Tags';
-import { ArticlesURL, feedURL, localStorageKey } from '../utilities/constants';
+import { Articles_URL, Feed_URL, Local_Storage_Key } from '../utilities/constants';
 import Pagiantion from './Pagination';
 
 class ArticlesHome extends React.Component {
@@ -35,17 +35,23 @@ class ArticlesHome extends React.Component {
     }
   }
   updateCurrentPageIndex = (index) => {
-    this.setState({ activePageIndex: index }, this.getArticles);
+    this.setState(
+      { activePageIndex: index },
+      this.state.feedSelected === 'myfeed' ? this.myFeed : this.getArticles
+    );
   };
 
   getArticles = () => {
-    let limit = this.state.articlesPerPage; 
+    let limit = this.state.articlesPerPage;
     let offset = (this.state.activePageIndex - 1) * 10;
     let tag = this.state.tagSelected;
-    let token = localStorage[localStorageKey];
+    let token = localStorage[Local_Storage_Key];
     fetch(
-      ArticlesURL + `/?offset=${offset}&limit=${limit}` + (tag && `&tag=${tag}`), {
-        method: "GET",
+      Articles_URL +
+        `/?offset=${offset}&limit=${limit}` +
+        (tag && `&tag=${tag}`),
+      {
+        method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-type': 'application/json',
@@ -59,7 +65,7 @@ class ArticlesHome extends React.Component {
         return res.json();
       })
       .then((data) => {
-        console.log({data})
+        console.log({ data });
         this.setState({
           articles: data.articles,
           articlesCount: data.articlesCount,
@@ -77,8 +83,8 @@ class ArticlesHome extends React.Component {
 
   myFeed = () => {
     let offset = (this.state.activePageIndex - 1) * 10;
-    let token = localStorage[localStorageKey];
-    fetch(feedURL + `?/limit=${this.state.articlesPerPage}&skip=${offset}`, {
+    let token = localStorage[Local_Storage_Key];
+    fetch(Feed_URL + `?/limit=${this.state.articlesPerPage}&skip=${offset}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -109,10 +115,10 @@ class ArticlesHome extends React.Component {
     console.log(method);
     console.log(id, slug);
     if (this.props.isLoggedIn) {
-      fetch(ArticlesURL + '/' + slug + '/favorite', {
+      fetch(Articles_URL + '/' + slug + '/favorite', {
         method: method,
         headers: {
-          Authorization: 'Token ' + localStorage[localStorageKey],
+          Authorization: 'Token ' + localStorage[Local_Storage_Key],
         },
       })
         .then((res) => {
@@ -153,7 +159,7 @@ class ArticlesHome extends React.Component {
             className={
               feedSelected === 'global'
                 ? 'cursor-pointer mr-8 text-xl text-green-500'
-                : 'cursor-pointer mr-8 text-xl'
+                : 'cursor-pointer mr-8 text-xl text-gray-600'
             }
             onClick={() =>
               this.setState(
@@ -174,7 +180,7 @@ class ArticlesHome extends React.Component {
                 ? 'hidden'
                 : feedSelected === 'myfeed'
                 ? 'text-xl mr-8 cursor-pointer text-green-500'
-                : 'text-xl  cursor-pointer green'
+                : 'text-xl  cursor-pointer text-gray-600'
             }
             onClick={this.myFeed}
           >

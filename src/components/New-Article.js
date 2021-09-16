@@ -1,6 +1,6 @@
 import React from 'react';
 import { withRouter } from 'react-router';
-import { ArticlesURL, localStorageKey } from '../utilities/constants';
+import { Articles_URL, Local_Storage_Key } from '../utilities/constants';
 import MarkdownIt from 'markdown-it';
 import MdEditor from 'react-markdown-editor-lite';
 // import style manually
@@ -22,10 +22,10 @@ class NewArticle extends React.Component {
   handleSubmit = (event) => {
     let { title, description, tags, body } = this.state;
     tags = tags.split(',').map((tag) => tag.trim());
-    let token = localStorage[localStorageKey];
+    let token = localStorage[Local_Storage_Key];
     event.preventDefault();
     if (title && description && tags && body) {
-      fetch(ArticlesURL, {
+      fetch(Articles_URL, {
         method: 'POST',
         headers: {
           'Content-type': 'application/json',

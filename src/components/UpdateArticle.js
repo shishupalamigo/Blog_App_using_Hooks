@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArticlesURL, localStorageKey } from '../utilities/constants';
+import { Articles_URL, Local_Storage_Key } from '../utilities/constants';
 import { withRouter } from 'react-router';
 import Loader from './Loader';
 
@@ -21,7 +21,7 @@ class UpdateArticle extends React.Component {
   }
 
   getArticle = () => {
-    fetch(ArticlesURL + `/${this.props.match.params.slug}`)
+    fetch(Articles_URL + `/${this.props.match.params.slug}`)
       .then((res) => {
         if (!res.ok) {
           throw new Error(res.statusText);
@@ -50,10 +50,10 @@ class UpdateArticle extends React.Component {
 
   handleSubmit = (event) => {
     let { title, description, body, tags } = this.state;
-    let token = 'Bearer ' + localStorage[localStorageKey];
+    let token = 'Bearer ' + localStorage[Local_Storage_Key];
     event.preventDefault();
     if (title && description && body && tags) {
-      fetch(ArticlesURL + '/' + this.props.match.params.slug, {
+      fetch(Articles_URL + '/' + this.props.match.params.slug, {
         method: 'PUT',
         body: JSON.stringify({
           article: {

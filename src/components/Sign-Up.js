@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { registerURL } from '../utilities/constants';
+import { Register_URL } from '../utilities/constants';
 import { validations } from '../utilities/validations';
 import { withRouter } from "react-router";
 
@@ -30,7 +30,7 @@ class Signup extends React.Component {
     let { email, password, username, errors } = this.state;
     event.preventDefault();
     if (username && password && email) {
-      fetch(registerURL, {
+      fetch(Register_URL, {
         method: 'POST',
         headers: {
           'Content-type': 'application/json; charset=UTF-8',
@@ -49,7 +49,7 @@ class Signup extends React.Component {
       })
       .then(({user}) => {
         console.log(user);
-        this.props.updateUser(user);
+        // this.props.updateUser(user);
         this.setState({password: "", email: "", username: "", errors})
         this.props.history.push("/login");
     })
@@ -60,8 +60,8 @@ class Signup extends React.Component {
   render() {
     let { username, password, email } = this.state.errors;
     return (
-      <main>
-        <section className="mt-20">
+      <main className="bg-gray-300 py-10">
+        <section className="py-20">
           <form
             className="w-1/3 mx-auto border border-gray-400 p-6 rounded-md shadow-md"
             onSubmit={this.handleSubmit}
@@ -69,7 +69,7 @@ class Signup extends React.Component {
             <div className="text-center">
               <legend className="text-2xl font-bold">Sign Up</legend>
               <Link to="/login">
-                <span className="text-green-700 text-lg text-center">
+                <span className="text-gray-700 text-lg text-center">
                   Already Have an account?{' '}
                 </span>
               </Link>
@@ -108,7 +108,7 @@ class Signup extends React.Component {
               <input
                 type="submit"
                 value="Sign Up"
-                className="block w-full btn bg-green-500 text-white font-bold cursor-pointer"
+                className="block w-full btn bg-gray-500 text-white font-bold cursor-pointer"
                 disabled={username || email || password}
               />
             </fieldset>

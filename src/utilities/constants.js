@@ -1,14 +1,14 @@
 const ROOT_URL = 'https://mighty-oasis-08080.herokuapp.com/api/';
 
-const ArticlesURL = ROOT_URL + 'articles';
-const TagsURL = ROOT_URL + 'tags';
+const Articles_URL = ROOT_URL + 'articles';
+const Tags_URL = ROOT_URL + 'tags';
 
-const loginURL = ROOT_URL + 'users/login';
-const registerURL = ROOT_URL + 'users';
-const UserVerifyURL = ROOT_URL + 'user';
-const feedURL = ROOT_URL + "articles/feed";
-const profileURL = ROOT_URL + "profiles/";
+const Login_URL = ROOT_URL + 'users/login';
+const Register_URL = ROOT_URL + 'users';
+const User_Verify_URL = ROOT_URL + 'user';
+const Feed_URL = ROOT_URL + "articles/feed";
+const Profile_URL = ROOT_URL + "profiles/";
 
-const localStorageKey = "app_user"
+const Local_Storage_Key = "app_user"
 
-export { ROOT_URL, ArticlesURL, TagsURL, loginURL, registerURL, localStorageKey, UserVerifyURL, feedURL, profileURL };
+export { ROOT_URL, Articles_URL, Tags_URL, Login_URL, Register_URL, Local_Storage_Key, User_Verify_URL, Feed_URL, Profile_URL };

@@ -13,7 +13,7 @@ import FullPageLoader from './components/FullPageLoader';
 import UpdateArticle from './components/UpdateArticle';
 import NotFound from './components/NotFound';
 
-import { localStorageKey, UserVerifyURL } from './utilities/constants';
+import { Local_Storage_Key, User_Verify_URL } from './utilities/constants';
 
 class App extends React.Component {
   state = {
@@ -23,9 +23,9 @@ class App extends React.Component {
   };
 
   componentDidMount() {
-    let storageKey = localStorage[localStorageKey];
+    let storageKey = localStorage[Local_Storage_Key];
     if (storageKey) {
-      fetch(UserVerifyURL, {
+      fetch(User_Verify_URL, {
         method: 'GET',
         headers: {
           authorization: `Token ${storageKey}`,
@@ -47,7 +47,7 @@ class App extends React.Component {
   }
   updateUser = (user) => {
     this.setState({ isLoggedIn: true, user, isVerifying: false });
-    localStorage.setItem(localStorageKey, user.token);
+    localStorage.setItem(Local_Storage_Key, user.token);
   };
   handleLogout = () => {
     this.setState({ isLoggedIn: false, user: null });

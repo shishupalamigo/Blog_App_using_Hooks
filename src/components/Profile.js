@@ -1,9 +1,9 @@
 import React from 'react';
 import Loader from './Loader';
 import {
-  ArticlesURL,
-  profileURL,
-  localStorageKey,
+  Articles_URL,
+  Profile_URL,
+  Local_Storage_Key,
 } from '../utilities/constants';
 import Articles from './Articles';
 import Pagination from './Pagination';
@@ -31,10 +31,10 @@ class Profile extends React.Component {
 
   getUserInfo = () => {
     let { id } = this.props.match.params;
-    fetch(profileURL + id, {
+    fetch(Profile_URL + id, {
       method: 'GET',
       headers: {
-        Authorization: 'Bearer ' + localStorage[localStorageKey],
+        Authorization: 'Bearer ' + localStorage[Local_Storage_Key],
       },
     })
       .then((res) => {
@@ -75,10 +75,10 @@ class Profile extends React.Component {
   getFeedArticles = () => {
     let { username } = this.state.user;
     let offset = (this.state.activePageIndex - 1) * 10;
-    let token = localStorage[localStorageKey];
+    let token = localStorage[Local_Storage_Key];
 
     fetch(
-      `${ArticlesURL}?${this.state.feedSelected}=${username}&limit=${this.state.articlesPerPage}&offset=${offset}`,
+      `${Articles_URL}?${this.state.feedSelected}=${username}&limit=${this.state.articlesPerPage}&offset=${offset}`,
       {
         method: 'GET',
         headers: {
@@ -108,10 +108,10 @@ class Profile extends React.Component {
     let { username } = this.state.user;
     let { following } = this.state;
     let method = following ? 'DELETE' : 'POST';
-    fetch(profileURL + '/' + username + '/follow', {
+    fetch(Profile_URL + '/' + username + '/follow', {
       method: method,
       headers: {
-        Authorization: 'Bearer ' + localStorage[localStorageKey],
+        Authorization: 'Bearer ' + localStorage[Local_Storage_Key],
       },
     })
       .then((res) => {
@@ -134,10 +134,10 @@ class Profile extends React.Component {
     let method = id === 'false' ? 'POST' : 'DELETE';
     console.log(method);
     console.log(id, slug);
-    fetch(ArticlesURL + '/' + slug + '/favorite', {
+    fetch(Articles_URL + '/' + slug + '/favorite', {
       method: method,
       headers: {
-        Authorization: 'Token ' + localStorage[localStorageKey],
+        Authorization: 'Token ' + localStorage[Local_Storage_Key],
       },
     })
       .then((res) => {
@@ -179,21 +179,21 @@ class Profile extends React.Component {
               className="w-40 h-40 rounded-full mx-auto"
             />
             <h2 className="text-4xl my-4 text-gray-700">{username}</h2>
-            <h3 className="text-2xl text-yellow-500 mb-5">{bio}</h3>
+            <h3 className="text-2xl text-gray-500 mb-5">{bio}</h3>
             <div className="float-right mr-10 ">
-              {loggedInUser !== username && (
+              {loggedInUser && loggedInUser !== username && (
                 <button
-                  className="bg-blue-300 text-gray-700 btn rounded-full hover:bg-blue-400 transform transition duration-500 hover:scale-105"
+                  className="bg-gray-200 text-gray-700 btn rounded-full hover:bg-gray-300 transform transition duration-500 hover:scale-105"
                   onClick={this.handleFollow}
                 >
-                  <i className="fas fa-plus mr-2"></i>
+                  <i className={!following ? "fas fa-plus mr-2" : "fas fa-minus mr-2"}></i>
                   {!following ? 'follow' : 'unfollow'}
                 </button>
               )}
-              {loggedInUser === username && (
+              {loggedInUser && loggedInUser === username && (
                 <Link
                   to="/settings"
-                  className="btn bg-gray-200 text-gray-600 hover:bg-yellow-200"
+                  className="btn bg-gray-200 text-gray-600 hover:bg-gray-300"
                 >
                   <i className="fas fa-user-edit mr-2"></i>Edit Profile
                 </Link>
@@ -207,7 +207,7 @@ class Profile extends React.Component {
                 className={
                   feedSelected === 'author'
                     ? 'cursor-pointer text-xl text-green-500 pb-2 border-b-2 border-green-500'
-                    : 'cursor-pointer text-xl'
+                    : 'cursor-pointer text-xl text-gray-700'
                 }
                 onClick={() =>
                   this.setState(
@@ -227,7 +227,7 @@ class Profile extends React.Component {
                 className={
                   feedSelected === 'favorited'
                     ? 'cursor-pointer text-xl text-green-500 pb-2 border-b-2 border-green-500'
-                    : 'cursor-pointer text-xl'
+                    : 'cursor-pointer text-xl text-gray-700'
                 }
                 onClick={() =>
                   this.setState(

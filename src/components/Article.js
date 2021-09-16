@@ -1,8 +1,10 @@
 import React from 'react';
 import Loader from './Loader';
 import { Link, withRouter } from 'react-router-dom';
-import { ArticlesURL, localStorageKey } from '../utilities/constants';
+import { Articles_URL, Local_Storage_Key } from '../utilities/constants';
 import CommentBox from './CommentBox';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 class Article extends React.Component {
   constructor(props) {
@@ -19,7 +21,7 @@ class Article extends React.Component {
 
   getArticle = () => {
     let slug = this.props.match.params.slug;
-    fetch(ArticlesURL + `/${slug}`)
+    fetch(Articles_URL + `/${slug}`)
       .then((res) => {
         if (!res.ok) {
           throw new Error(res.statusText);
@@ -41,7 +43,7 @@ class Article extends React.Component {
   };
   handleEdit = () => {
     let { slug } = this.state.article;
-    console.log(this.props, 'Article props from edit');
+    // console.log(this.props, 'Article props from edit');
     this.props.history.push({
       pathname: `/articles/edit/${slug}`,
       article: this.state.article,
@@ -51,10 +53,10 @@ class Article extends React.Component {
   handleDelete = () => {
     let { user } = this.props;
     // console.log(user.username, 'username');
-    fetch(ArticlesURL + '/' + this.props.match.params.slug, {
+    fetch(Articles_URL + '/' + this.props.match.params.slug, {
       method: 'DELETE',
       headers: {
-        Authorization: 'Bearer ' + localStorage[localStorageKey],
+        Authorization: 'Bearer ' + localStorage[Local_Storage_Key],
       },
     })
       .then((res) => {
@@ -70,13 +72,9 @@ class Article extends React.Component {
 
   render() {
     let { error, article } = this.state;
-    // console.log(this.props);
     let loggedInUser = this.props?.user?.username;
-    console.log(this.props, 'from Articles');
     let isLoggedIn = this.props?.isLoggedIn;
     let user = this.props?.user;
-    // console.log(loggedInUser, isLoggedIn);
-    // console.log(isLoggedIn, user);
     if (error) {
       return <h2 className="text-red-500 text-center text-xl mt-8">{error}</h2>;
     }
@@ -89,64 +87,76 @@ class Article extends React.Component {
     return (
       <main>
         {/* hero section */}
-        <section className="px-20 bg-green-700 text-white py-12">
-          <h2 className="mt-2 mb-3 text-4xl">{article.title}</h2>
-          <p className="">{article.description}</p>
-          <div className="flex py-6 items-center">
+        <section className="px-20 bg-gray-400 py-12 flex items-center rounded-md shadow-md">
+          <div className="flex py-6 items-center flex-col mr-20">
             <Link to={`/profiles/${article.author.username}`}>
               <img
-                src={article.author.image}
+                src={article.author.image || 'smiley.png'}
                 alt={article.author.username}
                 className="w-16 h-16 object-cover rounded-full"
               />
             </Link>
-            <span className="mx-3">{article.author.username}</span>
-            <span className="mx-3">{this.getDate(article.createdAt)}</span>
+            <span className="mx-3 text-gray-700 font-bold text-xl">
+              {article.author.username}
+            </span>
+            <span className="mx-3 text-gray-700">
+              {this.getDate(article.createdAt)}
+            </span>
           </div>
-          <div className="flex">
-            {tagList.map((tag) => {
-              return (
-                <span
-                  key={tag}
-                  className="mr-3 bg-blue-500 p-1 px-2 text-xs rounded-md"
-                >
-                  {tag}
-                </span>
-              );
-            })}
-          </div>
-          {isLoggedIn && user.username === article.author.username && (
-            <div className="float-right">
-              <span
-                className={
-                  'btn bg-gray-300 text-gray-600 rounded-md mx-3 cursor-pointer'
-                }
-                onClick={this.handleEdit}
-              >
-                <i className="far fa-edit mr-2"></i> Edit
-              </span>
+          <div className="flex flex-col w-5/6">
+            <h2 className="mt-2 mb-5 text-4xl self-center text-gray-900">
+              {article.title}
+            </h2>
+            <p className="self-start text-gray-800 mb-5">
+              {article.description}
+            </p>
+            <div className="flex justify-between">
+              <div className="flex">
+                {tagList.map((tag) => {
+                  return (
+                    <span
+                      key={tag}
+                      className="mr-3 bg-gray-700 p-1 px-2 text-xs rounded-md text-white"
+                    >
+                      {tag}
+                    </span>
+                  );
+                })}
+              </div>
+              {isLoggedIn && user.username === article.author.username && (
+                <div className="">
+                  <span
+                    className={
+                      'btn bg-gray-300 text-gray-600 rounded-md mx-3 cursor-pointer'
+                    }
+                    onClick={this.handleEdit}
+                  >
+                    <i className="far fa-edit mr-2"></i> Edit
+                  </span>
 
-              <span
-                className={
-                  'bg-red-700 btn text-white rounded-md mx-3 cursor-pointer'
-                }
-                onClick={this.handleDelete}
-              >
-                <i className="far fa-trash-alt mr-2"></i>Delete
-              </span>
+                  <span
+                    className={
+                      'btn bg-gray-300 text-gray-600 rounded-md mx-3 cursor-pointer'
+                    }
+                    onClick={this.handleDelete}
+                  >
+                    <i className="far fa-trash-alt mr-2"></i>Delete
+                  </span>
+                </div>
+              )}
             </div>
-          )}
-
-          {}
+          </div>
         </section>
 
         {/* article body */}
-        <section className="px-20 py-12">
-          <p className="text-lg text-gray-700 bg-yellow-100 px-5 py-5 border shadow-xl">
-            {article.body}
-          </p>
-        </section>
-        <section className="px-20 py-12">
+        <section className="bg-gray-100">
+          <div className="text-lg text-gray-700 px-20 py-12 border">
+            <ReactMarkdown
+              children={article.body}
+              remarkPlugins={[remarkGfm]}
+            />
+          </div>
+          <div className="px-20 py-12">
           <CommentBox {...this.props} slug={article.slug} />
           {!loggedInUser && (
             <div className="flex justify-center mt-10 mb-5">
@@ -159,7 +169,9 @@ class Article extends React.Component {
               </h3>
             </div>
           )}
+        </div>
         </section>
+
       </main>
     );
   }

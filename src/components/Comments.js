@@ -17,11 +17,11 @@ function Comments(props) {
           return (
             <div
               key={comment.createdAt}
-              className="flex item-center p-6 bg-gray-100 mb-4 rounded-t-md relative"
+              className="flex item-center p-6 bg-gray-300 mb-4 rounded-md relative shadow-md"
             >
               <div className="">
                 <img
-                  src={comment.author.image}
+                  src={comment.author.image || 'smiley.png'} 
                   alt={comment.author.username}
                   className="w-16 h-16 rounded-full"
                 />
@@ -35,7 +35,7 @@ function Comments(props) {
                   {isLoggedIn && loggedInUser === comment.author.username && (
                     <span className="absolute right-4 text-xl">
                       <i
-                        className="fas fa-trash cursor-pointer text-red-500"
+                        className="fas fa-trash cursor-pointer text-gray-800"
                         data-id={comment.id}
                         onClick={(e) => props.handleDelete(e)}
                       ></i>

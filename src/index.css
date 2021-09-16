@@ -16,7 +16,10 @@
     @apply bg-indigo-500 text-white font-semibold hover:bg-indigo-700  focus:ring-indigo-400;
   }
   .btn-active {
-    @apply bg-red-600 text-white focus:ring-red-500 hover:bg-red-400;
+    @apply bg-gray-700;
+  }
+  .btn-primary {
+    @apply bg-gray-400 text-gray-50 hover:bg-gray-500;
   }
 }
 

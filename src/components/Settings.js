@@ -1,6 +1,6 @@
 import React from 'react';
 import { validations } from '../utilities/validations';
-import { localStorageKey, UserVerifyURL } from '../utilities/constants';
+import { Local_Storage_Key, User_Verify_URL } from '../utilities/constants';
 import { withRouter } from 'react-router';
 
 class Settings extends React.Component {
@@ -31,14 +31,14 @@ class Settings extends React.Component {
     let { username, image, password, email, bio, errors } = this.state;
     event.preventDefault();
     if (username && image && password && email && bio) {
-      fetch(UserVerifyURL, {
+      fetch(User_Verify_URL, {
         method: 'PUT',
         body: JSON.stringify({
           user: { username, email, password, bio, image },
         }),
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + localStorage[localStorageKey],
+          Authorization: 'Bearer ' + localStorage[Local_Storage_Key],
         },
       })
         .then((res) => {

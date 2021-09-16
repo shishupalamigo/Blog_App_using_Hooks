@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArticlesURL, localStorageKey } from '../utilities/constants';
+import { Articles_URL, Local_Storage_Key } from '../utilities/constants';
 import Comments from './Comments';
 
 class CommentBox extends React.Component {
@@ -25,12 +25,12 @@ class CommentBox extends React.Component {
     let slug = this.props.slug;
     let { inputText } = this.state;
     if (inputText) {
-      fetch(ArticlesURL + '/' + slug + '/comments', {
+      fetch(Articles_URL + '/' + slug + '/comments', {
         method: 'POST',
         body: JSON.stringify({ comment: { body: inputText } }),
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + localStorage[localStorageKey],
+          Authorization: 'Bearer ' + localStorage[Local_Storage_Key],
         },
       })
         .then((res) => {
@@ -53,10 +53,10 @@ class CommentBox extends React.Component {
     let { id } = target.dataset;
     console.log(typeof id);
     let slug = this.props.slug;
-    fetch(ArticlesURL + '/' + slug + '/comments/' + id, {
+    fetch(Articles_URL + '/' + slug + '/comments/' + id, {
       method: 'DELETE',
       headers: {
-        Authorization: 'Token ' + localStorage[localStorageKey],
+        Authorization: 'Token ' + localStorage[Local_Storage_Key],
       },
     })
       .then((res) => {
@@ -72,7 +72,7 @@ class CommentBox extends React.Component {
 
   getComments = () => {
     let slug = this.props.slug;
-    fetch(ArticlesURL + '/' + slug + '/comments')
+    fetch(Articles_URL + '/' + slug + '/comments')
       .then((res) => {
         if (!res.ok) {
           return res.json().then(({ errors }) => {
@@ -108,7 +108,7 @@ class CommentBox extends React.Component {
             <input
               type="submit"
               value="Add Comment"
-              className="px-2 py-1 shadow-md btn-green self-end text-white text-xs rounded-md cursor-pointer hover:bg-blue-400 mt-5"
+              className="px-2 py-1 shadow-md btn-primary self-end text-white text-xs rounded-md cursor-pointer hover:bg-blue-400 mt-5"
             />
           </form>
         </div>

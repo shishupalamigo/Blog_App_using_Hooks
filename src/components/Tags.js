@@ -1,5 +1,5 @@
 import React from 'react';
-import { TagsURL } from '../utilities/constants';
+import { Tags_URL } from '../utilities/constants';
 import Loader from './Loader';
 
 class Tags extends React.Component {
@@ -12,7 +12,7 @@ class Tags extends React.Component {
   }
 
   componentDidMount() {
-    fetch(TagsURL)
+    fetch(Tags_URL)
       .then((res) => {
         if (!res.ok) {
           throw new Error(res.statusText);
@@ -37,20 +37,26 @@ class Tags extends React.Component {
       return <Loader />;
     }
     return (
-      <aside className="flex flex-wrap bg-green-200 px-4 py-8 rounded-md">
+      <aside className="flex flex-col items-center bg-gray-200 px-4 py-8 rounded-md shadow-lg">
+        <h2 className="text-2xl mb-5 font-bold text-gray-600">Tag Cloud</h2>
+        <div className="flex flex-wrap">
         {allTags.map((tag) => {
-        
+            if (tag !== "") {
             return (
               <span
                 key={tag}
-                className="bg-gray-800 p-2 cursor-pointer text-white text-xs rounded-md mx-1 my-1"
+                className="bg-gray-500 p-2 cursor-pointer text-white text-xs rounded-md mx-1 my-1"
                 onClick={(e) => this.props.selectTag(e)}
                 data-value={tag}
               >
                 {tag}
               </span>
             );
+            } else {
+              return null;
+            }
         })}
+        </div>
       </aside>
     );
   }
