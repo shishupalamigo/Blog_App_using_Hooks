@@ -8,6 +8,7 @@ import {
 import Articles from './Articles';
 import Pagination from './Pagination';
 import { withRouter, Link } from 'react-router-dom';
+import UserContext from "../context/UserContext";
 
 class Profile extends React.Component {
   constructor(props) {
@@ -24,7 +25,7 @@ class Profile extends React.Component {
       error: '',
     };
   }
-
+  static contextType = UserContext;
   componentDidMount() {
     this.getUserInfo();
   }
@@ -159,7 +160,8 @@ class Profile extends React.Component {
       return <Loader />;
     }
     let { username, image, bio } = this.state.user;
-    let loggedInUser = this.props?.user?.username;
+    // let loggedInUser = this.props?.user?.username;
+    let loggedInUser = this.context.data?.user?.username;
     let {
       articles,
       error,
@@ -247,7 +249,7 @@ class Profile extends React.Component {
               <Articles
                 articles={articles}
                 error={error}
-                isLoggedIn={this.props.isLoggedIn}
+                isLoggedIn={this.context.isLoggedIn}
                 handleFavorite={this.handleFavorite}
               />
             </div>

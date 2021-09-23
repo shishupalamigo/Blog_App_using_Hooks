@@ -5,6 +5,7 @@ import { Articles_URL, Local_Storage_Key } from '../utilities/constants';
 import CommentBox from './CommentBox';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import UserContext from '../context/UserContext';
 
 class Article extends React.Component {
   constructor(props) {
@@ -14,7 +15,7 @@ class Article extends React.Component {
       error: '',
     };
   }
-
+  static contextType = UserContext;
   componentDidMount() {
     this.getArticle();
   }
@@ -71,10 +72,15 @@ class Article extends React.Component {
   };
 
   render() {
+    if (this.state.info) {
+      throw new Error('Something went wrong');
+    }
     let { error, article } = this.state;
     let loggedInUser = this.props?.user?.username;
-    let isLoggedIn = this.props?.isLoggedIn;
-    let user = this.props?.user;
+    let { isLoggedIn, user } = this.context.data;
+    // let isLoggedIn = this.context.isLoggedIn;
+    // let user = this.props?.user;
+
     if (error) {
       return <h2 className="text-red-500 text-center text-xl mt-8">{error}</h2>;
     }
@@ -157,21 +163,20 @@ class Article extends React.Component {
             />
           </div>
           <div className="px-20 py-12">
-          <CommentBox {...this.props} slug={article.slug} />
-          {!loggedInUser && (
-            <div className="flex justify-center mt-10 mb-5">
-              <h3 className="text-xl text-gray-600">
-                Please
-                <Link to="/login" className="text-green-700 mx-1">
-                  Login
-                </Link>
-                to Add Comments on the Article
-              </h3>
-            </div>
-          )}
-        </div>
+            <CommentBox slug={article.slug} />
+            {!loggedInUser && (
+              <div className="flex justify-center mt-10 mb-5">
+                <h3 className="text-xl text-gray-600">
+                  Please
+                  <Link to="/login" className="text-green-700 mx-1">
+                    Login
+                  </Link>
+                  to Add Comments on the Article
+                </h3>
+              </div>
+            )}
+          </div>
         </section>
-
       </main>
     );
   }
