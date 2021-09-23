@@ -119,14 +119,18 @@ class Article extends React.Component {
             <div className="flex justify-between">
               <div className="flex">
                 {tagList.map((tag) => {
-                  return (
-                    <span
-                      key={tag}
-                      className="mr-3 bg-gray-700 p-1 px-2 text-xs rounded-md text-white"
-                    >
-                      {tag}
-                    </span>
-                  );
+                  if (!tag) {
+                    return null;
+                  } else {
+                    return (
+                      <span
+                        key={tag}
+                        className="mr-3 bg-gray-700 p-1 px-2 text-xs rounded-md text-white"
+                      >
+                        {tag}
+                      </span>
+                    );
+                  }
                 })}
               </div>
               {isLoggedIn && user.username === article.author.username && (
@@ -164,7 +168,7 @@ class Article extends React.Component {
           </div>
           <div className="px-20 py-12">
             <CommentBox slug={article.slug} />
-            {!loggedInUser && (
+            {!isLoggedIn && !loggedInUser && (
               <div className="flex justify-center mt-10 mb-5">
                 <h3 className="text-xl text-gray-600">
                   Please
