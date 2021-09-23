@@ -3,6 +3,7 @@ import Articles from './Articles';
 import Tags from './Tags';
 import { Articles_URL, Feed_URL, Local_Storage_Key } from '../utilities/constants';
 import Pagiantion from './Pagination';
+import UserContext from "../context/UserContext";
 
 class ArticlesHome extends React.Component {
   constructor(props) {
@@ -18,9 +19,10 @@ class ArticlesHome extends React.Component {
       feedSelected: '',
     };
   }
-
+  static contextType = UserContext;
   componentDidMount() {
-    if (this.props.isLoggedIn) {
+    let {isLoggedIn} = this.context.data;
+    if (isLoggedIn) {
       this.setState({ feedSelected: 'myfeed' }, this.myFeed);
     } else {
       this.setState({ feedSelected: 'global' }, this.getArticles);
@@ -110,11 +112,12 @@ class ArticlesHome extends React.Component {
       .catch((err) => this.setState({ error: 'Not able to fetch Articles' }));
   };
   handleFavorite = ({ target }) => {
+    let {isLoggedIn} = this.context.data;
     let { id, slug } = target.dataset;
     let method = id === 'false' ? 'POST' : 'DELETE';
     console.log(method);
     console.log(id, slug);
-    if (this.props.isLoggedIn) {
+    if (isLoggedIn) {
       fetch(Articles_URL + '/' + slug + '/favorite', {
         method: method,
         headers: {
@@ -141,6 +144,7 @@ class ArticlesHome extends React.Component {
   };
 
   render() {
+    let {isLoggedIn} = this.context.data;
     let {
       articles,
       error,
@@ -149,6 +153,7 @@ class ArticlesHome extends React.Component {
       activePageIndex,
       feedSelected,
     } = this.state;
+    console.log(articles, "From Main");
 
     return (
       // Hero section
@@ -176,7 +181,7 @@ class ArticlesHome extends React.Component {
           </span>
           <span
             className={
-              !this.props.isLoggedIn
+              !isLoggedIn
                 ? 'hidden'
                 : feedSelected === 'myfeed'
                 ? 'text-xl mr-8 cursor-pointer text-green-500'
@@ -202,7 +207,6 @@ class ArticlesHome extends React.Component {
             <Articles
               articles={articles}
               error={error}
-              isLoggedIn={this.props.isLoggedIn}
               handleFavorite={this.handleFavorite}
             />
           </div>

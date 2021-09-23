@@ -1,10 +1,16 @@
 import { NavLink, withRouter } from 'react-router-dom';
 import { Local_Storage_Key } from '../utilities/constants';
+import {useContext} from "react";
+import UserContext from "../context/UserContext";
 
 function Header(props) {
-  function handleLogout() {
+  let userData = useContext(UserContext);
+  let {isLoggedIn} = userData.data;
+  let {handleLogout} = userData;
+
+  function logout() {
     localStorage.removeItem(Local_Storage_Key);
-    props.handleLogout();
+    handleLogout();
     props.history.push("/articles")
   }
   return (
@@ -15,8 +21,8 @@ function Header(props) {
         </h1>
       </NavLink>
       <nav className="flex">
-        {props.isLoggedIn ? (
-          <AuthHeader {...props} handleLogout={handleLogout} />
+        {isLoggedIn ? (
+          <AuthHeader handleLogout={logout} />
         ) : (
           <NonAuthHeader />
         )}
@@ -26,23 +32,26 @@ function Header(props) {
 }
 
 function AuthHeader(props) {
+  let userData = useContext(UserContext);
+  let {user} = userData.data;
+  let {handleLogout} = props;
   return (
     <nav className="flex items-center">
       <NavLink
         to={{
           user: props.user,
-          pathname: `/profiles/${props.user.username}`,
+          pathname: `/profiles/${user.username}`,
         }}
         className="btn mr-5 btn-primary"
         activeClassName="btn-active"
       >
         <li className="flex items-center text-xl mx-3">
           <img
-            src={props.user.image || "smiley.png"} 
-            alt={props.user.username}
+            src={user.image || "smiley.png"} 
+            alt={user.username}
             className="w-5 h-5 rounded-full"
           />
-          <span className="ml-2 text-gray-50 font-medium">{props.user.username}</span>
+          <span className="ml-2 text-gray-50 font-medium">{user.username}</span>
         </li>
       </NavLink>
       <NavLink
@@ -59,7 +68,7 @@ function AuthHeader(props) {
       >
         New Article
       </NavLink>
-      <button className="btn btn-primary" onClick={props.handleLogout}>
+      <button className="btn btn-primary" onClick={handleLogout}>
         Logout
       </button>
     </nav>

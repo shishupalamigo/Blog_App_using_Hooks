@@ -2,22 +2,29 @@ import React from 'react';
 import { validations } from '../utilities/validations';
 import { Local_Storage_Key, User_Verify_URL } from '../utilities/constants';
 import { withRouter } from 'react-router';
+import Loader from './Loader';
+import UserContext from "../context/UserContext";
 
 class Settings extends React.Component {
   constructor(props) {
     super();
     this.state = {
-      image: props.user.image,
-      username: props.user.username,
-      email: props.user.email,
+      image: "",
+      username: "",
+      email: "",
       password: '',
-      bio: props.user.bio,
+      bio: "",
       errors: {
         username: '',
         email: '',
         password: '',
       },
     };
+  }
+  static contextType = UserContext;
+  componentDidMount() {
+      let {image, username, email, bio} = this.context.data.user;
+      this.setState({image, username, email, bio});
   }
 
   handleChange = ({ target }) => {
@@ -61,6 +68,9 @@ class Settings extends React.Component {
   };
 
   render() {
+    if(!this.state.username && !this.state.email && !this.state.image && !this.state.bio) {
+      return < Loader />
+  }
     let { username, email, password } = this.state.errors;
 
     return (

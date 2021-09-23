@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Register_URL } from '../utilities/constants';
 import { validations } from '../utilities/validations';
 import { withRouter } from "react-router";
+import UserContext from "../context/UserContext";
 
 class Signup extends React.Component {
   constructor(props) {
@@ -18,7 +19,7 @@ class Signup extends React.Component {
       },
     };
   }
-
+  static contextType = UserContext;
   handleChange = ({ target }) => {
     let { name, value } = target;
     let errors = this.state.errors;

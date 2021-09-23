@@ -1,19 +1,25 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Loader from './Loader';
+import UserContext from "../context/UserContext";
 
 class Articles extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
   }
+  static contextType = UserContext;
+  
   getDate = (date) => {
     let newDate = new Date(date).toISOString().split('T')[0];
     return newDate;
   };
 
   render() {
-    let { articles, error } = this.props;
+    let {isLoggedIn} = this.context.data;
+    
+    let {articles, error } = this.props;
+    console.log(articles , "from Articles");
     if (error) {
       return <h2 className="text-red-500 text-center text-xl mt-8">{error}</h2>;
     }
@@ -55,7 +61,7 @@ class Articles extends React.Component {
                 <div className="flex items-center text-xl border-gray-500 px-3 py-1 rounded-full shadow-lg bg-gray-400">
                   <i
                     className={
-                      !this.props.isLoggedIn
+                      isLoggedIn
                         ? 'fas fa-heart text-red-700'
                         : article.favorited
                         ? 'fas fa-heart cursor-pointer text-pink-600'

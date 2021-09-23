@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { validations } from '../utilities/validations';
 import { Login_URL } from '../utilities/constants';
 import { withRouter } from 'react-router';
+import UserContext from "../context/UserContext";
 
 class Login extends React.Component {
   constructor(props) {
@@ -16,7 +17,7 @@ class Login extends React.Component {
       },
     };
   }
-
+  static contextType = UserContext;
   handleChange = ({ target }) => {
     let { name, value } = target;
     let { errors } = this.state;
@@ -44,8 +45,8 @@ class Login extends React.Component {
           return res.json();
         })
         .then(({ user }) => {
-          console.log(user);
-          this.props.updateUser(user);
+          console.log(user ,"From Login");
+          this.context.handleUser(user);
           this.setState({ password: '', email: '' });
           this.props.history.push('/articles');
         })

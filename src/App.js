@@ -13,6 +13,7 @@ import FullPageLoader from './components/FullPageLoader';
 import UpdateArticle from './components/UpdateArticle';
 import NotFound from './components/NotFound';
 import ErrorBoundary from "./components/ErrorBoundry";
+import {UserProvider} from "./context/UserContext";
 
 import { Local_Storage_Key, User_Verify_URL } from './utilities/constants';
 
@@ -61,14 +62,16 @@ class App extends React.Component {
     }
     return (
       <Router>
+      <UserProvider value={{data: this.state, handleUser: this.updateUser, handleLogout: this.handleLogout }}>
         <ErrorBoundary>      
-        <Header {...this.state} handleLogout={this.handleLogout} />
+        <Header />
         {this.state.isLoggedIn ? (
-          <AuthenticatedApp {...this.state} handleUser={this.updateUser} />
+          <AuthenticatedApp />
         ) : (
-          <UnAuthenticatedApp updateUser={this.updateUser} />
+          <UnAuthenticatedApp />
         )}
         </ErrorBoundary>
+        </UserProvider>
       </Router>
     );
   }
@@ -80,22 +83,22 @@ function AuthenticatedApp(props) {
         <Home />
       </Route>
       <Route path="/articles" exact>
-        <ArticlesHome {...props} />
+        <ArticlesHome />
       </Route>
       <Route path="/articles/edit/:slug">
         <UpdateArticle />
       </Route>
       <Route path="/articles/:slug">
-        <Article {...props} />
+        <Article />
       </Route>
       <Route path="/new-article" exact>
         <NewArticle />
       </Route>
       <Route path="/settings" exact>
-        <Settings user={props.user} handleUser={props.updateUser} />
+        <Settings />
       </Route>
       <Route path="/profiles/:id" exact>
-        <Profile user={props.user} />
+        <Profile user={props.user} isLoggedIn={props.isLoggedIn} />
       </Route>
       <Route path="*">
         <NotFound />
@@ -111,16 +114,16 @@ function UnAuthenticatedApp(props) {
         <Home />
       </Route>
       <Route path="/register" exact>
-        <Signup updateUser={props.updateUser} />
+        <Signup />
       </Route>
       <Route path="/login" exact>
-        <Login updateUser={props.updateUser} />
+        <Login />
       </Route>
       <Route path="/articles" exact>
-        <ArticlesHome {...props} />
+        <ArticlesHome />
       </Route>
       <Route path="/articles/:slug">
-        <Article {...props} />
+        <Article />
       </Route>
       <Route path="/profiles/:id" exact>
         <Profile user={props.user} />
