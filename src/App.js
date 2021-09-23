@@ -12,6 +12,7 @@ import Profile from './components/Profile';
 import FullPageLoader from './components/FullPageLoader';
 import UpdateArticle from './components/UpdateArticle';
 import NotFound from './components/NotFound';
+import ErrorBoundary from "./components/ErrorBoundry";
 
 import { Local_Storage_Key, User_Verify_URL } from './utilities/constants';
 
@@ -60,12 +61,14 @@ class App extends React.Component {
     }
     return (
       <Router>
+        <ErrorBoundary>      
         <Header {...this.state} handleLogout={this.handleLogout} />
         {this.state.isLoggedIn ? (
           <AuthenticatedApp {...this.state} handleUser={this.updateUser} />
         ) : (
           <UnAuthenticatedApp updateUser={this.updateUser} />
         )}
+        </ErrorBoundary>
       </Router>
     );
   }
