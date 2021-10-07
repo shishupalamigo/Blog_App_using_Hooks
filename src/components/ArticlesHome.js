@@ -1,57 +1,31 @@
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Articles from './Articles';
 import Tags from './Tags';
-import { Articles_URL, Feed_URL, Local_Storage_Key } from '../utilities/constants';
+import {
+  Articles_URL,
+  Feed_URL,
+  Local_Storage_Key,
+} from '../utilities/constants';
 import Pagiantion from './Pagination';
-import UserContext from "../context/UserContext";
+import UserContext from '../context/UserContext';
 
-class ArticlesHome extends React.Component {
-  constructor(props) {
-    super();
+function ArticlesHome(props) {
+  const [articles, setArticles] = useState(null);
+  const [error, setError] = useState('');
+  const [articlesCount, setArticlesCount] = useState(0);
+  const [articlesPerPage] = useState(10);
+  const [activePageIndex, setActivePageIndex] = useState(1);
+  const [tagSelected, setTagSelected] = useState('');
+  const [url, setUrl] = useState(Articles_URL);
+  const info = useContext(UserContext);
+  let { isLoggedIn } = info.data;
 
-    this.state = {
-      articles: null,
-      error: '',
-      articlesCount: 0,
-      articlesPerPage: 10,
-      activePageIndex: 1,
-      tagSelected: '',
-      feedSelected: '',
-    };
-  }
-  static contextType = UserContext;
-  componentDidMount() {
-    let {isLoggedIn} = this.context.data;
-    if (isLoggedIn) {
-      this.setState({ feedSelected: 'myfeed' }, this.myFeed);
-    } else {
-      this.setState({ feedSelected: 'global' }, this.getArticles);
-    }
-  }
-  componentDidUpdate(_prevProps, prevState) {
-    if (
-      prevState.activePageIndex !== this.state.activePageIndex ||
-      prevState.tagSelected !== this.state.tagSelected
-    ) {
-      this.getArticles();
-    }
-  }
-  updateCurrentPageIndex = (index) => {
-    this.setState(
-      { activePageIndex: index },
-      this.state.feedSelected === 'myfeed' ? this.myFeed : this.getArticles
-    );
-  };
-
-  getArticles = () => {
-    let limit = this.state.articlesPerPage;
-    let offset = (this.state.activePageIndex - 1) * 10;
-    let tag = this.state.tagSelected;
+  function getArticles(url, activePageIndex, articlesPerPage, tagSelected) {
     let token = localStorage[Local_Storage_Key];
     fetch(
-      Articles_URL +
-        `/?offset=${offset}&limit=${limit}` +
-        (tag && `&tag=${tag}`),
+      url +
+        `/?offset=${(activePageIndex - 1) * 10}&limit=${articlesPerPage}` +
+        (tagSelected && `&tag=${tagSelected}`),
       {
         method: 'GET',
         headers: {
@@ -67,56 +41,34 @@ class ArticlesHome extends React.Component {
         return res.json();
       })
       .then((data) => {
-        console.log({ data });
-        this.setState({
-          articles: data.articles,
-          articlesCount: data.articlesCount,
-        });
+        setArticles(data.articles);
+        setArticlesCount(data.articlesCount);
       })
       .catch((err) => {
-        this.setState({ error: 'Not able to fetch Articles' });
+        setError('Not able to fetch Articles');
       });
-  };
+  }
 
-  selectTag = ({ target }) => {
+  useEffect(() => {
+    getArticles(url, activePageIndex, articlesPerPage, tagSelected);
+    return () => {};
+  }, [url, activePageIndex, articlesPerPage, tagSelected]);
+
+  function updateCurrentPageIndex(index) {
+    setActivePageIndex(index);
+    setTagSelected('');
+  }
+
+  function selectTag({ target }) {
     let { value } = target.dataset;
-    this.setState({ tagSelected: value }, this.getArticles());
-  };
+    setTagSelected(value);
+    setActivePageIndex(1);
+    setUrl(Articles_URL);
+  }
 
-  myFeed = () => {
-    let offset = (this.state.activePageIndex - 1) * 10;
-    let token = localStorage[Local_Storage_Key];
-    fetch(Feed_URL + `?/limit=${this.state.articlesPerPage}&skip=${offset}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-type': 'application/json',
-      },
-    })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(res.statusText);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        // console.log(data ,"from my feed");
-        this.setState({
-          articles: data.articles,
-          articlesCount: data.articlesCount,
-          feedSelected: 'myfeed',
-          tagSelected: '',
-        });
-      })
-
-      .catch((err) => this.setState({ error: 'Not able to fetch Articles' }));
-  };
-  handleFavorite = ({ target }) => {
-    let {isLoggedIn} = this.context.data;
+  function handleFavorite({ target }) {
     let { id, slug } = target.dataset;
     let method = id === 'false' ? 'POST' : 'DELETE';
-    console.log(method);
-    console.log(id, slug);
     if (isLoggedIn) {
       fetch(Articles_URL + '/' + slug + '/favorite', {
         method: method,
@@ -133,101 +85,98 @@ class ArticlesHome extends React.Component {
           return res.json();
         })
         .then((data) => {
-          if (this.state.feedSelected === 'myfeed') {
-            this.myFeed();
+          if (url === Feed_URL) {
+            getArticles(
+              Feed_URL,
+              activePageIndex,
+              articlesPerPage,
+              tagSelected
+            );
           } else {
-            this.getArticles();
+            getArticles(
+              Articles_URL,
+              activePageIndex,
+              articlesPerPage,
+              tagSelected
+            );
           }
         })
         .catch((err) => console.log(err));
     }
-  };
+  }
 
-  render() {
-    let {isLoggedIn} = this.context.data;
-    let {
-      articles,
-      error,
-      articlesCount,
-      articlesPerPage,
-      activePageIndex,
-      feedSelected,
-    } = this.state;
-    console.log(articles, "From Main");
-
-    return (
-      // Hero section
-      <main className="px-24 py-16 w-full">
-        {/* feeds part */}
-        <div className="flex mb-3">
+  return (
+    // Hero section
+    <main className="px-24 py-16 w-full">
+      {/* feeds part */}
+      <div className="flex mb-3">
+        <span
+          className={
+            url === Articles_URL
+              ? 'cursor-pointer mr-8 text-xl text-green-500'
+              : 'cursor-pointer mr-8 text-xl text-gray-600'
+          }
+          onClick={() => {
+            setTagSelected('');
+            setUrl(Articles_URL);
+          }}
+        >
+          <i className="fas fa-newspaper mr-2"></i>
+          Global Feed
+        </span>
+        {isLoggedIn && (
           <span
             className={
-              feedSelected === 'global'
-                ? 'cursor-pointer mr-8 text-xl text-green-500'
-                : 'cursor-pointer mr-8 text-xl text-gray-600'
-            }
-            onClick={() =>
-              this.setState(
-                {
-                  tagSelected: '',
-                  feedSelected: 'global',
-                },
-                this.getArticles
-              )
-            }
-          >
-            <i className="fas fa-newspaper mr-2"></i>
-            Global Feed
-          </span>
-          <span
-            className={
-              !isLoggedIn
-                ? 'hidden'
-                : feedSelected === 'myfeed'
+              url === Feed_URL
                 ? 'text-xl mr-8 cursor-pointer text-green-500'
                 : 'text-xl  cursor-pointer text-gray-600'
             }
-            onClick={this.myFeed}
+            onClick={() => {
+              setTagSelected('');
+              setUrl(Feed_URL);
+              setActivePageIndex(1);
+            }}
           >
             {' '}
             <i className="fas fa-newspaper mr-2"></i>
             My feed
           </span>
-          <div
-            className={this.state.tagSelected ? 'visible text-xl' : 'hidden'}
-          >
+        )}
+
+        {tagSelected && (
+          <div className="text-xl">
             <span className="mx-2 text-gray-500">/</span>
-            <span className="text-green-700">#{this.state.tagSelected}</span>
+            <span className="text-green-700">#{tagSelected}</span>
           </div>
-        </div>
+        )}
+      </div>
 
-        {/* articles part */}
-        <section className="flex justify-between ">
-          <div className="w-4/6">
-            <Articles
-              articles={articles}
-              error={error}
-              handleFavorite={this.handleFavorite}
-            />
-          </div>
-
-          {/* tags part */}
-          <div className="w-80">
-            <Tags selectTag={this.selectTag} />
-          </div>
-          {/* Pagination */}
-        </section>
-        <div className="mt-10">
-          <Pagiantion
-            articlesCount={articlesCount}
-            articlesPerPage={articlesPerPage}
-            activePageIndex={activePageIndex}
-            updateCurrentPageIndex={this.updateCurrentPageIndex}
+      {/* articles part */}
+      <section className="flex justify-between ">
+        <div className="w-4/6">
+          <Articles
+            articles={articles}
+            error={error}
+            handleFavorite={handleFavorite}
           />
         </div>
-      </main>
-    );
-  }
+
+        {/* tags part */}
+        <div className="w-80">
+          <Tags selectTag={selectTag} />
+        </div>
+        {/* Pagination */}
+      </section>
+      <div className="mt-10">
+        <Pagiantion
+          articlesCount={articlesCount}
+          articlesPerPage={articlesPerPage}
+          activePageIndex={activePageIndex}
+          updateCurrentPageIndex={updateCurrentPageIndex}
+        />
+      </div>
+    </main>
+  );
 }
 
 export default ArticlesHome;
