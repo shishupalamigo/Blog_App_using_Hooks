@@ -13,10 +13,10 @@ function Pagiantion(props) {
   }
   return (
     <>
-      <div className="flex justify-between">
+      <div className="flex justify-between flex-wrap">
         {activePageIndex !== 1 && numberOfPages !== 0 && (
           <p
-            className="font-bold self-center cursor-pointer hover:shadow-lg"
+            className="font-bold self-center cursor-pointer hover:shadow-lg mr-2"
             onClick={() =>
               updateCurrentPageIndex(
                 activePageIndex - 1 < 1 ? 1 : activePageIndex - 1
@@ -33,8 +33,8 @@ function Pagiantion(props) {
               key={page}
               className={
                 activePageIndex === page
-                  ? 'bg-gray-800 text-white py-2 px-4 cursor-pointer hover:bg-green-500 rounded'
-                  : 'border border-gray-400 bg-green-50 py-2 px-4 cursor-pointer hover:bg-blue-400 rounded'
+                  ? 'bg-gray-800 text-white py-2 px-4 cursor-pointer hover:bg-green-500 rounded mx-2 my-2'
+                  : 'border border-gray-400 bg-green-50 py-2 px-4 cursor-pointer hover:bg-blue-400 rounded mx-2 my-2'
               }
               onClick={() => updateCurrentPageIndex(page)}
             >

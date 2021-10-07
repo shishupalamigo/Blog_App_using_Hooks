@@ -1,6 +1,6 @@
 import Loader from './Loader';
-import {useContext} from "react";
-import UserContext from "../context/UserContext";
+import { useContext } from 'react';
+import UserContext from '../context/UserContext';
 
 function Comments(props) {
   function getDate(date) {
@@ -8,16 +8,18 @@ function Comments(props) {
     return newDate;
   }
 
-  // let { comments, loggedInUser, isLoggedIn } = props;
   let user = useContext(UserContext);
-  let {comments} = props;
-  let {isLoggedIn} = user?.data;
+  let { comments } = props;
+  let { isLoggedIn } = user?.data;
   let loggedInUser = user.data?.user?.username;
   if (!comments) {
     return <Loader />;
   }
   return (
     <>
+      {comments.length && (
+        <h2 className="text-2xl mb-5 text-gray-500 font-bold">Comments</h2>
+      )}
       {comments.length > 0 ? (
         comments.map((comment) => {
           return (
@@ -27,7 +29,7 @@ function Comments(props) {
             >
               <div className="">
                 <img
-                  src={comment.author.image || 'smiley.png'} 
+                  src={comment.author.image || 'smiley.png'}
                   alt={comment.author.username}
                   className="w-16 h-16 rounded-full"
                 />

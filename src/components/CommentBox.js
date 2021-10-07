@@ -1,30 +1,26 @@
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Articles_URL, Local_Storage_Key } from '../utilities/constants';
 import Comments from './Comments';
-import UserContext from "../context/UserContext";
+import UserContext from '../context/UserContext';
 
-class CommentBox extends React.Component {
-  constructor(props) {
-    super();
-    this.state = {
-      inputText: '',
-      comments: '',
-    };
+function CommentBox(props) {
+  const [inputText, setInputText] = useState('');
+  const [comments, setComents] = useState('');
+  const info = useContext(UserContext);
+  let slug = props.slug;
+
+  useEffect(() => {
+    getComments(slug);
+  }, [slug]);
+
+  function handleChange({ target }) {
+    let { value } = target;
+    setInputText(value);
   }
-  static contextType = UserContext;
-  componentDidMount() {
-    this.getComments();
-  }
 
-  handleChange = ({ target }) => {
-    let { name, value } = target;
-    this.setState({ [name]: value });
-  };
-
-  handleSubmit = (event) => {
+  function handleSubmit(event) {
     event.preventDefault();
-    let slug = this.props.slug;
-    let { inputText } = this.state;
+    let slug = props.slug;
     if (inputText) {
       fetch(Articles_URL + '/' + slug + '/comments', {
         method: 'POST',
@@ -43,17 +39,17 @@ class CommentBox extends React.Component {
           return res.json();
         })
         .then((data) => {
-          console.log(data);
-          this.setState({ inputText: '', comments: '' }, this.getComments);
+          setInputText('');
+          setComents('');
+          getComments(slug);
         })
         .catch((err) => console.log(err));
     }
-  };
+  }
 
-  handleDelete = ({ target }) => {
+  function handleDelete({ target }) {
     let { id } = target.dataset;
-    console.log(typeof id);
-    let slug = this.props.slug;
+    let slug = props.slug;
     fetch(Articles_URL + '/' + slug + '/comments/' + id, {
       method: 'DELETE',
       headers: {
@@ -66,13 +62,13 @@ class CommentBox extends React.Component {
             return Promise.reject(errors);
           });
         }
-        this.setState({ comments: '' }, this.getComments);
+        setComents('');
+        getComments(slug);
       })
       .catch((err) => console.log(err));
-  };
+  }
 
-  getComments = () => {
-    let slug = this.props.slug;
+  function getComments(slug) {
     fetch(Articles_URL + '/' + slug + '/comments')
       .then((res) => {
         if (!res.ok) {
@@ -83,30 +79,26 @@ class CommentBox extends React.Component {
         return res.json();
       })
       .then(({ comments }) => {
-        console.log(comments);
-        this.setState({ comments });
+        setComents(comments);
       })
       .catch((err) => console.log(err));
-  };
+  }
 
-  render() {
-    let { inputText, comments } = this.state;
-    // let loggedInUser = this.props?.user?.username;
-    let loggedInUser = this.context.data?.user?.username;
-    console.log(loggedInUser, "user");
-    // let {isLoggedIn} = this.context.data;
-    return (
-      <>
-      {
-        loggedInUser && (
-          <div className="">
-          <form className="my-6 flex flex-col w-1/3" onSubmit={this.handleSubmit}>
+  let loggedInUser = info.data?.user?.username;
+  return (
+    <>
+      {loggedInUser && (
+        <div className="">
+          <form
+            className="my-6 flex flex-col w-1/3"
+            onSubmit={(e) => handleSubmit(e)}
+          >
             <textarea
               className="w-full border-2 border-gray-400 rounded-md p-3 outline-none focus:border-blue-500"
               rows="3"
               placeholder="Enter Comments"
               value={inputText}
-              onChange={this.handleChange}
+              onChange={(e) => handleChange(e)}
               name="inputText"
             ></textarea>
             <input
@@ -116,18 +108,13 @@ class CommentBox extends React.Component {
             />
           </form>
         </div>
-        )
-      }
+      )}
 
-        <div className="my-8">
-          <Comments
-            comments={comments}
-            handleDelete={this.handleDelete}
-          />
-        </div>
-      </>
-    );
-  }
+      <div className="my-8">
+        <Comments comments={comments} handleDelete={handleDelete} />
+      </div>
+    </>
+  );
 }
 
 export default CommentBox;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { withRouter } from 'react-router';
 import { Articles_URL, Local_Storage_Key } from '../utilities/constants';
 import MarkdownIt from 'markdown-it';
@@ -6,21 +6,21 @@ import MdEditor from 'react-markdown-editor-lite';
 // import style manually
 import 'react-markdown-editor-lite/lib/index.css';
 
-class NewArticle extends React.Component {
-  state = {
+function NewArticle(props) {
+  const [state, setState] = useState({
     title: '',
     description: '',
     tags: '',
     body: '',
     error: '',
-  };
-  handleChange = ({ target }) => {
+  });
+  function handleChange({ target }) {
     let { name, value } = target;
-    this.setState({ [name]: value });
-  };
+    setState({ ...state, [name]: value });
+  }
 
-  handleSubmit = (event) => {
-    let { title, description, tags, body } = this.state;
+  function handleSubmit(event) {
+    let { title, description, tags, body } = state;
     tags = tags.split(',').map((tag) => tag.trim());
     let token = localStorage[Local_Storage_Key];
     event.preventDefault();
@@ -45,82 +45,75 @@ class NewArticle extends React.Component {
         })
         .then((data) => {
           // console.log(data);
-          this.props.history.push(`/articles/${data.article.slug}`);
+          props.history.push(`/articles/${data.article.slug}`);
         })
         .catch((err) => {
           // console.log(err);
-          this.setState({
-            title: '',
-            description: '',
-            body: '',
-            tags: '',
-            error: '',
+          setState({
+            ...state,
+            error: 'Enter all fields',
           });
         });
     } else {
-      this.setState({
+      setState({
         title: '',
         description: '',
         body: '',
         tags: '',
-        error: 'Enter all fields',
+        error: '',
       });
     }
-  };
-  handleEditorChange = ({ html, text }) => {
-    this.setState({
-      body: text,
-    });
-  };
-  clearEditor = ({html, text}) => {
-   return html = ""
+  }
+  function handleEditorChange({ html, text }) {
+    setState({ ...state, body: text });
+  }
+  function clearEditor({ html, text }) {
+    return (html = '');
   }
 
-  render() {
-    const mdParser = new MarkdownIt();
-    return (
-      <main>
-        <section>
-          <form className="w-2/4 mx-auto mt-10" onSubmit={this.handleSubmit}>
-            <input
-              className="block w-full my-3 py-2 px-3 border border-gray-400 rounded-md"
-              type="text"
-              placeholder="Enter Title"
-              value={this.state.title}
-              name="title"
-              onChange={(e) => this.handleChange(e)}
-            ></input>
-            <input
-              className="block w-full my-3 py-2 px-3 border border-gray-400 rounded-md"
-              type="text"
-              placeholder="Enter Description"
-              value={this.state.description}
-              name="description"
-              onChange={(e) => this.handleChange(e)}
-            ></input>
-            <input
-              className="block w-full my-3 py-2 px-3 border border-gray-400 rounded-md"
-              type="text"
-              placeholder="Enter Tags"
-              value={this.state.tags}
-              name="tags"
-              onChange={(e) => this.handleChange(e)}
-            ></input>
-            <MdEditor
-              style={{ height: '500px' }}
-              renderHTML={(text) => mdParser.render(text)}
-              onChange={this.handleEditorChange}
-              onSubmit={this.clearEditor}
-            />
-            <input
-              type="submit"
-              value="Publish Article"
-              className="block float-right btn bg-green-500 text-white font-bold cursor-pointer mt-10"
-            />
-          </form>
-        </section>
-      </main>
-    );
-  }
+  const mdParser = new MarkdownIt();
+  return (
+    <main>
+      <section>
+        <form className="w-2/4 mx-auto mt-10" onSubmit={handleSubmit}>
+          <input
+            className="block w-full my-3 py-2 px-3 border border-gray-400 rounded-md"
+            type="text"
+            placeholder="Enter Title"
+            value={state.title}
+            name="title"
+            onChange={(e) => handleChange(e)}
+          ></input>
+          <input
+            className="block w-full my-3 py-2 px-3 border border-gray-400 rounded-md"
+            type="text"
+            placeholder="Enter Description"
+            value={state.description}
+            name="description"
+            onChange={(e) => handleChange(e)}
+          ></input>
+          <input
+            className="block w-full my-3 py-2 px-3 border border-gray-400 rounded-md"
+            type="text"
+            placeholder="Enter Tags"
+            value={state.tags}
+            name="tags"
+            onChange={(e) => handleChange(e)}
+          ></input>
+          <MdEditor
+            style={{ height: '500px' }}
+            renderHTML={(text) => mdParser.render(text)}
+            onChange={handleEditorChange}
+            onSubmit={clearEditor}
+          />
+          <input
+            type="submit"
+            value="Publish Article"
+            className="block float-right btn bg-green-500 text-white font-bold cursor-pointer mt-10"
+          />
+        </form>
+      </section>
+    </main>
+  );
 }
 export default withRouter(NewArticle);

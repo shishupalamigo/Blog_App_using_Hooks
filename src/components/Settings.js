@@ -1,47 +1,59 @@
-import React from 'react';
+import React,{useState, useEffect,useContext} from 'react';
 import { validations } from '../utilities/validations';
 import { Local_Storage_Key, User_Verify_URL } from '../utilities/constants';
 import { withRouter } from 'react-router';
 import Loader from './Loader';
 import UserContext from "../context/UserContext";
 
-class Settings extends React.Component {
-  constructor(props) {
-    super();
-    this.state = {
+function Settings (props) {
+  // constructor(props) {
+  //   super();
+  //   state = {
+  //     image: "",
+  //     username: "",
+  //     email: "",
+  //     password: '',
+  //     bio: "",
+  //     errors: {
+  //       username: '',
+  //       email: '',
+  //       password: '',
+  //     },
+  //   };
+  // }
+  const [state, setState] = useState({
       image: "",
       username: "",
-      email: "",
       password: '',
       bio: "",
       errors: {
         username: '',
-        email: '',
         password: '',
       },
-    };
-  }
-  static contextType = UserContext;
-  componentDidMount() {
-      let {image, username, email, bio} = this.context.data.user;
-      this.setState({image, username, email, bio});
-  }
+  })
+  const info = useContext(UserContext);
 
-  handleChange = ({ target }) => {
+  useEffect(() => {
+      let {image, username, bio} = info.data.user;
+      setState(state => {
+        return {...state, image, username, bio}}
+  )}, [info.data])
+
+  function handleChange ({ target }) {
     let { name, value } = target;
-    let { errors } = this.state;
+    let  errors  = state.errors;
     validations(errors, name, value);
-    this.setState({ [name]: value, errors });
+    setState({...state, [name]: value, errors });
   };
 
-  handleSubmit = (event) => {
-    let { username, image, password, email, bio, errors } = this.state;
+  function handleSubmit (event) {
+    let { username, image, password, bio, errors } = state;
     event.preventDefault();
-    if (username && image && password && email && bio) {
+    if (username && image && password && bio) {
       fetch(User_Verify_URL, {
         method: 'PUT',
         body: JSON.stringify({
-          user: { username, email, password, bio, image },
+          user: { username, password, bio, image },
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -61,24 +73,23 @@ class Settings extends React.Component {
           return res.json();
         })
         .then((data) => {
-          this.props.history.push(`/profiles/${data.user.username}`);
+          props.history.push(`/profiles/${data.user.username}`);
         })
-        .catch((err) => this.setState({ errors }));
+        .catch((err) => setState({...state, errors }));
     }
   };
 
-  render() {
-    if(!this.state.username && !this.state.email && !this.state.image && !this.state.bio) {
+    if(!state.username && !state.image && !state.bio) {
       return < Loader />
   }
-    let { username, email, password } = this.state.errors;
+    let { username, password } = state.errors;
 
     return (
       <main>
         <section className="py-20">
           <form
             className="w-1/2 mx-auto p-8 border border-gray-400 rounded-md"
-            onSubmit={this.handleSubmit}
+            onSubmit={handleSubmit}
           >
             <legend className="text-center text-3xl my-2 font-bold">
               Settings
@@ -87,8 +98,8 @@ class Settings extends React.Component {
               <input
                 type="text"
                 placeholder="Image Url"
-                value={this.state.image}
-                onChange={this.handleChange}
+                value={state.image}
+                onChange={handleChange}
                 name="image"
                 className="my-2 p-2 rounded-md outline-none border-2 border-gray-300 focus:border-blue-500"
               />
@@ -96,37 +107,28 @@ class Settings extends React.Component {
               <input
                 type="text"
                 name="username"
-                value={this.state.username}
-                onChange={this.handleChange}
+                value={state.username}
+                onChange={handleChange}
                 className="my-2 p-2 rounded-md outline-none border-2 border-gray-300 focus:border-blue-500"
               />
               <span className="my-1 text-red-500">{username}</span>
 
               <input
-                type="email"
-                name="email"
-                value={this.state.email}
-                onChange={this.handleChange}
-                className="my-2 p-2 rounded-md outline-none border-2 border-gray-300 focus:border-blue-500"
-              />
-              <span className="my-1 text-red-500">{email}</span>
-
-              <input
                 type="password"
                 name="password"
-                value={this.state.password}
+                value={state.password}
                 placeholder="Password"
-                onChange={this.handleChange}
+                onChange={handleChange}
                 className="my-2 p-2 rounded-md outline-none border-2 border-gray-300 focus:border-blue-500"
               />
               <span className="my-1 text-red-500">{password}</span>
 
               <textarea
-                value={this.state.bio}
+                value={state.bio}
                 rows="6"
                 name="bio"
                 placeholder="Enter your Bio"
-                onChange={this.handleChange}
+                onChange={handleChange}
                 className="my-2 p-2 rounded-md outline-none border-2 border-gray-300 focus:border-blue-500"
               ></textarea>
 
@@ -140,7 +142,6 @@ class Settings extends React.Component {
         </section>
       </main>
     );
-  }
-}
+  };
 
 export default withRouter(Settings);
